@@ -1,0 +1,75 @@
+.ranking-panel {
+  padding: 24rpx;
+}
+
+.group-panel + .group-panel {
+  margin-top: 24rpx;
+}
+
+.ranking-head {
+  margin-bottom: 18rpx;
+}
+
+.table {
+  overflow: hidden;
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(13, 95, 212, 0.08);
+}
+
+.table__row {
+  display: flex;
+  align-items: center;
+  min-height: 80rpx;
+  padding: 0 12rpx;
+  background: #ffffff;
+}
+
+.table__row + .table__row {
+  border-top: 1rpx solid #edf2f7;
+}
+
+.table__row--head {
+  background: #f3f8ff;
+  color: var(--theme-text-secondary);
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.table__row--gold {
+  background: rgba(243, 192, 77, 0.12);
+}
+
+.table__row--silver {
+  background: rgba(213, 220, 235, 0.26);
+}
+
+.table__row--bronze {
+  background: rgba(215, 160, 125, 0.12);
+}
+
+.table__cell {
+  width: 56rpx;
+  text-align: center;
+  font-size: 22rpx;
+}
+
+.table__cell--rank {
+  width: 72rpx;
+  font-weight: 700;
+}
+
+.table__cell--team {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  padding: 0 12rpx;
+}
+
+.table__cell--wide {
+  width: 92rpx;
+}
+
+.table__cell--points {
+  color: var(--theme-primary);
+  font-weight: 700;
+}

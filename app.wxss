@@ -1,0 +1,118 @@
+page {
+  --theme-primary: #0d5fd4;
+  --theme-primary-soft: #eaf3ff;
+  --theme-primary-deep: #083b8a;
+  --theme-bg: #f4f8fc;
+  --theme-surface: #ffffff;
+  --theme-border: #d7e5f5;
+  --theme-text: #15314b;
+  --theme-text-secondary: #68809c;
+  --theme-gold: #f3c04d;
+  --theme-silver: #d5dceb;
+  --theme-bronze: #d7a07d;
+  --theme-warning: #f5b800;
+  --theme-danger: #db4a4a;
+  --page-padding: 28rpx;
+  background: linear-gradient(180deg, #eef5ff 0%, #f7fbff 260rpx, #f4f8fc 100%);
+  color: var(--theme-text);
+  font-size: 28rpx;
+}
+
+view,
+scroll-view,
+swiper,
+swiper-item,
+text,
+image {
+  box-sizing: border-box;
+}
+
+.app-page {
+  min-height: 100vh;
+  padding-bottom: 168rpx;
+}
+
+.page-scroll {
+  height: 100vh;
+}
+
+.page-shell {
+  padding: 24rpx var(--page-padding) 0;
+}
+
+.section-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--theme-text);
+}
+
+.section-subtitle {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--theme-text-secondary);
+}
+
+.panel {
+  background: var(--theme-surface);
+  border: 1rpx solid var(--theme-border);
+  border-radius: 28rpx;
+  box-shadow: 0 10rpx 30rpx rgba(13, 95, 212, 0.06);
+}
+
+.event-tabs {
+  display: flex;
+  gap: 20rpx;
+  padding: 10rpx 0 20rpx;
+  white-space: nowrap;
+}
+
+.event-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18rpx 28rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1rpx solid rgba(13, 95, 212, 0.1);
+  color: var(--theme-text-secondary);
+  font-size: 26rpx;
+  transition: all 0.2s ease;
+}
+
+.event-tab--active {
+  background: var(--theme-primary);
+  color: #ffffff;
+  box-shadow: 0 12rpx 24rpx rgba(13, 95, 212, 0.2);
+}
+
+.segmented {
+  display: flex;
+  gap: 12rpx;
+  padding: 10rpx;
+  margin-top: 20rpx;
+  background: rgba(255, 255, 255, 0.76);
+  border-radius: 999rpx;
+  border: 1rpx solid rgba(13, 95, 212, 0.08);
+}
+
+.segmented__item {
+  flex: 1;
+  padding: 18rpx 10rpx;
+  border-radius: 999rpx;
+  text-align: center;
+  color: var(--theme-text-secondary);
+  font-size: 26rpx;
+}
+
+.segmented__item--active {
+  background: var(--theme-primary);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.empty-state {
+  margin-top: 24rpx;
+  padding: 48rpx 28rpx;
+  text-align: center;
+  color: var(--theme-text-secondary);
+}

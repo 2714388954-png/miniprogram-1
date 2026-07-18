@@ -1,0 +1,86 @@
+<navigation-bar title="积分榜" back="{{false}}" color="#15314b" background="transparent"></navigation-bar>
+<scroll-view class="page-scroll" scroll-y>
+  <view class="app-page">
+    <view class="page-shell">
+      <scroll-view class="event-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
+        <block wx:for="{{events}}" wx:key="eventId">
+          <view
+            class="event-tab {{activeEventId === item.eventId ? 'event-tab--active' : ''}}"
+            bindtap="handleEventSwitch"
+            data-event-id="{{item.eventId}}"
+          >
+            {{item.eventName}}
+          </view>
+        </block>
+      </scroll-view>
+
+      <block wx:if="{{standings && standings.type === 'league'}}">
+        <view class="ranking-panel panel">
+          <view class="ranking-head">
+            <text class="section-title">联赛积分</text>
+            <text class="section-subtitle">前几名进行轻度高亮，整体保持简洁清晰。</text>
+          </view>
+          <view class="table">
+            <view class="table__row table__row--head">
+              <text class="table__cell table__cell--rank">排名</text>
+              <text class="table__cell table__cell--team">球队</text>
+              <text class="table__cell">赛</text>
+              <text class="table__cell">胜</text>
+              <text class="table__cell">平</text>
+              <text class="table__cell">负</text>
+              <text class="table__cell table__cell--wide">进/失</text>
+              <text class="table__cell">积分</text>
+            </view>
+            <block wx:for="{{standings.table}}" wx:key="teamId">
+              <view class="table__row {{item.rank === 1 ? 'table__row--gold' : item.rank === 2 ? 'table__row--silver' : item.rank === 3 ? 'table__row--bronze' : ''}}">
+                <text class="table__cell table__cell--rank">{{item.rank}}</text>
+                <text class="table__cell table__cell--team">{{item.teamName}}</text>
+                <text class="table__cell">{{item.played}}</text>
+                <text class="table__cell">{{item.win}}</text>
+                <text class="table__cell">{{item.draw}}</text>
+                <text class="table__cell">{{item.lose}}</text>
+                <text class="table__cell table__cell--wide">{{item.goalsFor}}/{{item.goalsAgainst}}</text>
+                <text class="table__cell table__cell--points">{{item.points}}</text>
+              </view>
+            </block>
+          </view>
+        </view>
+      </block>
+
+      <block wx:if="{{standings && standings.type === 'group'}}">
+        <block wx:for="{{standings.groups}}" wx:key="groupName">
+          <view class="ranking-panel panel group-panel">
+            <view class="ranking-head">
+              <text class="section-title">{{item.groupName}}</text>
+            </view>
+            <view class="table">
+              <view class="table__row table__row--head">
+                <text class="table__cell table__cell--rank">排名</text>
+                <text class="table__cell table__cell--team">球队</text>
+                <text class="table__cell">赛</text>
+                <text class="table__cell">胜</text>
+                <text class="table__cell">平</text>
+                <text class="table__cell">负</text>
+                <text class="table__cell table__cell--wide">进/失</text>
+                <text class="table__cell">积分</text>
+              </view>
+              <block wx:for="{{item.table}}" wx:key="teamId">
+                <view class="table__row {{item.rank === 1 ? 'table__row--gold' : item.rank === 2 ? 'table__row--silver' : ''}}">
+                  <text class="table__cell table__cell--rank">{{item.rank}}</text>
+                  <text class="table__cell table__cell--team">{{item.teamName}}</text>
+                  <text class="table__cell">{{item.played}}</text>
+                  <text class="table__cell">{{item.win}}</text>
+                  <text class="table__cell">{{item.draw}}</text>
+                  <text class="table__cell">{{item.lose}}</text>
+                  <text class="table__cell table__cell--wide">{{item.goalsFor}}/{{item.goalsAgainst}}</text>
+                  <text class="table__cell table__cell--points">{{item.points}}</text>
+                </view>
+              </block>
+            </view>
+          </view>
+        </block>
+      </block>
+    </view>
+    <bottom-tab-bar current="standings"></bottom-tab-bar>
+  </view>
+</scroll-view>

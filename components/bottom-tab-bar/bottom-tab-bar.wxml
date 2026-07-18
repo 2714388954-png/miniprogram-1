@@ -1,0 +1,12 @@
+<view class="tabbar-shell">
+  <view class="tabbar panel">
+    <block wx:for="{{tabs}}" wx:key="key">
+      <view class="tabbar__item" bindtap="handleSwitch" data-key="{{item.key}}" data-path="{{item.path}}">
+        <view class="tabbar__sticker {{current === item.key ? 'tabbar__sticker--active' : ''}}">
+          <text class="tabbar__sticker-text">{{item.sticker}}</text>
+        </view>
+        <text class="tabbar__label {{current === item.key ? 'tabbar__label--active' : ''}}">{{item.label}}</text>
+      </view>
+    </block>
+  </view>
+</view>

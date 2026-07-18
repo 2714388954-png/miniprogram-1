@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "navigation-bar": "/components/navigation-bar/navigation-bar",
+    "bottom-tab-bar": "/components/bottom-tab-bar/bottom-tab-bar"
+  }
+}

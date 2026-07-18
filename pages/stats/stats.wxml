@@ -1,0 +1,51 @@
+<navigation-bar title="数据榜" back="{{false}}" color="#15314b" background="transparent"></navigation-bar>
+<scroll-view class="page-scroll" scroll-y>
+  <view class="app-page">
+    <view class="page-shell">
+      <scroll-view class="event-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
+        <block wx:for="{{events}}" wx:key="eventId">
+          <view
+            class="event-tab {{activeEventId === item.eventId ? 'event-tab--active' : ''}}"
+            bindtap="handleEventSwitch"
+            data-event-id="{{item.eventId}}"
+          >
+            {{item.eventName}}
+          </view>
+        </block>
+      </scroll-view>
+
+      <view class="segmented">
+        <block wx:for="{{statTabs}}" wx:key="key">
+          <view
+            class="segmented__item {{activeStatKey === item.key ? 'segmented__item--active' : ''}}"
+            bindtap="handleStatSwitch"
+            data-stat-key="{{item.key}}"
+          >
+            {{item.label}}
+          </view>
+        </block>
+      </view>
+
+      <view class="stats-panel panel">
+        <view class="stats-head">
+          <text class="section-title">球员榜单</text>
+          <text class="section-subtitle">按当前赛事独立统计，后续只需更新数据即可。</text>
+        </view>
+        <block wx:if="{{statRows.length}}">
+          <block wx:for="{{statRows}}" wx:key="playerId">
+            <view class="stats-row {{item.rank <= 3 ? 'stats-row--top' : ''}}">
+              <view class="stats-row__rank">{{item.rank}}</view>
+              <view class="stats-row__main">
+                <text class="stats-row__name">{{item.playerName}}</text>
+                <text class="stats-row__team">{{item.teamName}}</text>
+              </view>
+              <view class="stats-row__value">{{item.value}}{{statUnit}}</view>
+            </view>
+          </block>
+        </block>
+        <view wx:else class="empty-state">当前榜单暂时还没有数据。</view>
+      </view>
+    </view>
+    <bottom-tab-bar current="stats"></bottom-tab-bar>
+  </view>
+</scroll-view>

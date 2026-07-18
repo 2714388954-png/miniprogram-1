@@ -1,0 +1,56 @@
+.stage-section + .stage-section {
+  margin-top: 28rpx;
+}
+
+.match-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  margin-top: 18rpx;
+}
+
+.match-card {
+  padding: 24rpx;
+}
+
+.match-card__teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+}
+
+.match-card__team {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.match-card__team--right {
+  text-align: right;
+}
+
+.match-card__score {
+  min-width: 120rpx;
+  text-align: center;
+  padding: 12rpx 14rpx;
+  border-radius: 999rpx;
+  background: #eef3f9;
+  color: var(--theme-text-secondary);
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+.match-card__score--done {
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+}
+
+.match-card__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-top: 18rpx;
+  font-size: 22rpx;
+  color: var(--theme-text-secondary);
+}

@@ -1,0 +1,65 @@
+<navigation-bar title="重大学生足球协会" back="{{false}}" color="#15314b" background="transparent"></navigation-bar>
+<scroll-view class="page-scroll" scroll-y>
+  <view class="app-page">
+    <view class="page-shell">
+      <scroll-view class="event-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
+        <block wx:for="{{events}}" wx:key="eventId">
+          <view
+            class="event-tab {{activeEventId === item.eventId ? 'event-tab--active' : ''}}"
+            bindtap="handleEventSwitch"
+            data-event-id="{{item.eventId}}"
+          >
+            {{item.eventName}}
+          </view>
+        </block>
+      </scroll-view>
+
+      <view class="hero panel">
+        <view class="hero__meta">
+          <text class="hero__eyebrow">{{currentEvent.season}}赛季</text>
+          <text class="hero__title">{{currentEvent.fullName}}</text>
+          <text class="hero__desc">{{currentEvent.description}}</text>
+        </view>
+        <swiper class="hero__swiper" indicator-dots autoplay circular interval="4500">
+          <block wx:for="{{featuredNews}}" wx:key="newsId">
+            <swiper-item>
+              <view class="hero__slide" bindtap="openNewsDetail" data-news-id="{{item.newsId}}">
+                <image class="hero__image" src="{{item.coverImage}}" mode="aspectFill"></image>
+                <view class="hero__overlay">
+                  <text class="hero__tag">{{item.category}}</text>
+                  <text class="hero__headline">{{item.title}}</text>
+                  <text class="hero__summary">{{item.summary}}</text>
+                </view>
+              </view>
+            </swiper-item>
+          </block>
+        </swiper>
+      </view>
+
+      <view class="section">
+        <text class="section-title">赛事新闻</text>
+        <text class="section-subtitle">新闻按平台排序展示，可结合流量数据和人工置顶灵活调整。</text>
+
+        <view class="news-list">
+          <block wx:for="{{newsList}}" wx:key="newsId">
+            <view class="news-card panel" bindtap="openNewsDetail" data-news-id="{{item.newsId}}">
+              <image class="news-card__image" src="{{item.coverImage}}" mode="aspectFill"></image>
+              <view class="news-card__content">
+                <view class="news-card__topline">
+                  <view class="news-card__tags">
+                    <text class="news-card__tag">{{item.category}}</text>
+                    <text wx:if="{{item.isPinned}}" class="news-card__pin">置顶</text>
+                  </view>
+                  <text class="news-card__time">{{item.publishTime}}</text>
+                </view>
+                <text class="news-card__title">{{item.title}}</text>
+                <text class="news-card__summary">{{item.summary}}</text>
+              </view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+    <bottom-tab-bar current="home"></bottom-tab-bar>
+  </view>
+</scroll-view>

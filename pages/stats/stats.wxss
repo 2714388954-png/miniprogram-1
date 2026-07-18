@@ -1,0 +1,60 @@
+.stats-panel {
+  margin-top: 24rpx;
+  padding: 24rpx;
+}
+
+.stats-head {
+  margin-bottom: 18rpx;
+}
+
+.stats-row {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  padding: 22rpx 0;
+}
+
+.stats-row + .stats-row {
+  border-top: 1rpx solid #edf2f7;
+}
+
+.stats-row--top .stats-row__rank {
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+}
+
+.stats-row__rank {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef3f9;
+  color: var(--theme-text-secondary);
+  font-weight: 700;
+}
+
+.stats-row__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.stats-row__name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.stats-row__team {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--theme-text-secondary);
+}
+
+.stats-row__value {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--theme-primary);
+}

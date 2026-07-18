@@ -1,0 +1,44 @@
+<navigation-bar title="赛程赛果" back="{{false}}" color="#15314b" background="transparent"></navigation-bar>
+<scroll-view class="page-scroll" scroll-y>
+  <view class="app-page">
+    <view class="page-shell">
+      <scroll-view class="event-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
+        <block wx:for="{{events}}" wx:key="eventId">
+          <view
+            class="event-tab {{activeEventId === item.eventId ? 'event-tab--active' : ''}}"
+            bindtap="handleEventSwitch"
+            data-event-id="{{item.eventId}}"
+          >
+            {{item.eventName}}
+          </view>
+        </block>
+      </scroll-view>
+
+      <block wx:for="{{stageGroups}}" wx:key="stageName">
+        <view class="stage-section">
+          <view class="stage-heading">
+            <text class="section-title">{{item.stageName}}</text>
+          </view>
+          <view class="match-list">
+            <block wx:for="{{item.matches}}" wx:key="matchId">
+              <view class="match-card panel">
+                <view class="match-card__teams">
+                  <text class="match-card__team">{{item.homeTeam}}</text>
+                  <text class="match-card__score {{item.status === 'finished' ? 'match-card__score--done' : ''}}">
+                    {{item.status === 'finished' ? item.homeScore + ' : ' + item.awayScore : 'VS'}}
+                  </text>
+                  <text class="match-card__team match-card__team--right">{{item.awayTeam}}</text>
+                </view>
+                <view class="match-card__meta">
+                  <text>{{item.matchTime}}</text>
+                  <text>{{item.location}}</text>
+                </view>
+              </view>
+            </block>
+          </view>
+        </view>
+      </block>
+    </view>
+    <bottom-tab-bar current="schedule"></bottom-tab-bar>
+  </view>
+</scroll-view>

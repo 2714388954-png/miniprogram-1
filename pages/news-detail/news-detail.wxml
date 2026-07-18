@@ -1,0 +1,19 @@
+<navigation-bar title="新闻详情" color="#15314b" background="transparent"></navigation-bar>
+<scroll-view class="page-scroll" scroll-y>
+  <view class="page-shell detail-page">
+    <block wx:if="{{newsItem}}">
+      <view class="detail-header">
+        <text class="detail-title">{{newsItem.title}}</text>
+        <view class="detail-meta">
+          <text class="detail-tag">{{newsItem.category}}</text>
+          <text class="detail-time">{{newsItem.publishTime}}</text>
+        </view>
+      </view>
+      <image class="detail-cover panel" src="{{newsItem.coverImage}}" mode="aspectFill"></image>
+      <view class="detail-body panel">
+        <text class="detail-content">{{newsItem.content}}</text>
+      </view>
+    </block>
+    <view wx:else class="empty-state panel">未找到这条新闻内容。</view>
+  </view>
+</scroll-view>
