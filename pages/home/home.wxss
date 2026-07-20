@@ -10,6 +10,13 @@
   gap: 10rpx;
 }
 
+.hero__title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
 .hero__eyebrow {
   font-size: 22rpx;
   color: var(--theme-primary);
@@ -25,6 +32,44 @@
   font-size: 24rpx;
   color: var(--theme-text-secondary);
   line-height: 1.6;
+}
+
+.hero__status {
+  flex: none;
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(13, 95, 212, 0.1);
+  color: var(--theme-primary);
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.hero__overview {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.hero__overview-card {
+  flex: 1;
+  padding: 18rpx 16rpx;
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1rpx solid rgba(13, 95, 212, 0.08);
+}
+
+.hero__overview-value {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--theme-primary-deep);
+}
+
+.hero__overview-label {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: var(--theme-text-secondary);
 }
 
 .hero__swiper {

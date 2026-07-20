@@ -1,3 +1,26 @@
+.stats-summary {
+  margin-top: 24rpx;
+  padding: 24rpx;
+}
+
+.stats-summary__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.stats-summary__badge {
+  flex: none;
+  max-width: 240rpx;
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(13, 95, 212, 0.1);
+  color: var(--theme-primary);
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
 .stats-panel {
   margin-top: 24rpx;
   padding: 24rpx;

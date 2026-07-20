@@ -9,8 +9,7 @@ const news = [
     category: '赛事战报',
     isFeatured: true,
     isPinned: true,
-    priority: 100,
-    views: 328,
+    sortOrder: 1,
     content:
       '春季联赛首轮比赛中，经管学院与电气学院奉献了一场高强度对抗。双方上半场各有攻守，下半场节奏进一步提升，经管学院在补时阶段完成制胜进球，拿到赛季开门红。',
   },
@@ -24,8 +23,7 @@ const news = [
     category: '赛前预告',
     isFeatured: true,
     isPinned: false,
-    priority: 72,
-    views: 186,
+    sortOrder: 2,
     content:
       '第二轮赛程已经完成排定，各学院球队将于本周末继续展开较量。请关注具体开球时间与场地信息，文明观赛，共同维护良好的校园赛事氛围。',
   },
@@ -39,8 +37,7 @@ const news = [
     category: '球员数据',
     isFeatured: false,
     isPinned: false,
-    priority: 68,
-    views: 241,
+    sortOrder: 3,
     content:
       '随着首轮赛事全部结束，球员数据榜单同步更新。经管学院前锋张三以2粒进球暂居射手榜第一，助攻榜和纪律榜也已同步开放查询。',
   },
@@ -54,8 +51,7 @@ const news = [
     category: '协会公告',
     isFeatured: true,
     isPinned: true,
-    priority: 96,
-    views: 412,
+    sortOrder: 0,
     content:
       '新生杯分组抽签工作已经结束，各参赛队伍将按照分组开展小组赛。赛事信息将统一在小程序内更新，同学们可以通过赛程页和积分榜页实时查看比赛进展。',
   },

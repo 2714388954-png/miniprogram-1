@@ -1,20 +1,33 @@
-const { getEvents, getDefaultEventId, getStandingsByEvent } = require('../../data/index');
+const {
+  getEvents,
+  getDefaultEventId,
+  getEventById,
+  getEventOverview,
+  getStandingsByEvent,
+} = require('../../data/index');
 
 Page({
   data: {
     events: [],
     activeEventId: '',
+    currentEvent: null,
+    overview: null,
     standings: null,
-    tableColumns: ['排名', '球队', '赛', '胜', '平', '负', '进/失', '积分'],
   },
 
   onLoad() {
     const events = getEvents();
     const activeEventId = getDefaultEventId();
+    this.syncPage(events, activeEventId);
+  },
+
+  syncPage(events, eventId) {
     this.setData({
       events,
-      activeEventId,
-      standings: getStandingsByEvent(activeEventId),
+      activeEventId: eventId,
+      currentEvent: getEventById(eventId),
+      overview: getEventOverview(eventId),
+      standings: getStandingsByEvent(eventId),
     });
   },
 
@@ -24,9 +37,6 @@ Page({
       return;
     }
 
-    this.setData({
-      activeEventId: eventId,
-      standings: getStandingsByEvent(eventId),
-    });
+    this.syncPage(this.data.events, eventId);
   },
 });

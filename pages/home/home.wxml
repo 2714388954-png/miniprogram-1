@@ -14,33 +14,55 @@
         </block>
       </scroll-view>
 
-      <view class="hero panel">
+      <view wx:if="{{currentEvent}}" class="hero panel">
         <view class="hero__meta">
           <text class="hero__eyebrow">{{currentEvent.season}}赛季</text>
-          <text class="hero__title">{{currentEvent.fullName}}</text>
+          <view class="hero__title-row">
+            <text class="hero__title">{{currentEvent.fullName}}</text>
+            <text class="hero__status">{{overview.statusLabel}}</text>
+          </view>
           <text class="hero__desc">{{currentEvent.description}}</text>
         </view>
-        <swiper class="hero__swiper" indicator-dots autoplay circular interval="4500">
-          <block wx:for="{{featuredNews}}" wx:key="newsId">
-            <swiper-item>
-              <view class="hero__slide" bindtap="openNewsDetail" data-news-id="{{item.newsId}}">
-                <image class="hero__image" src="{{item.coverImage}}" mode="aspectFill"></image>
-                <view class="hero__overlay">
-                  <text class="hero__tag">{{item.category}}</text>
-                  <text class="hero__headline">{{item.title}}</text>
-                  <text class="hero__summary">{{item.summary}}</text>
+
+        <view class="hero__overview">
+          <view class="hero__overview-card">
+            <text class="hero__overview-value">{{overview.eventTypeLabel}}</text>
+            <text class="hero__overview-label">赛事类型</text>
+          </view>
+          <view class="hero__overview-card">
+            <text class="hero__overview-value">{{overview.finishedMatches}} / {{overview.totalMatches}}</text>
+            <text class="hero__overview-label">已完成比赛</text>
+          </view>
+          <view class="hero__overview-card">
+            <text class="hero__overview-value">{{overview.pinnedCount}}</text>
+            <text class="hero__overview-label">置顶新闻</text>
+          </view>
+        </view>
+
+        <block wx:if="{{featuredNews.length}}">
+          <swiper class="hero__swiper" indicator-dots autoplay circular interval="4500">
+            <block wx:for="{{featuredNews}}" wx:key="newsId">
+              <swiper-item>
+                <view class="hero__slide" bindtap="openNewsDetail" data-news-id="{{item.newsId}}">
+                  <image class="hero__image" src="{{item.coverImage}}" mode="aspectFill"></image>
+                  <view class="hero__overlay">
+                    <text class="hero__tag">{{item.category}}</text>
+                    <text class="hero__headline">{{item.title}}</text>
+                    <text class="hero__summary">{{item.summary}}</text>
+                  </view>
                 </view>
-              </view>
-            </swiper-item>
-          </block>
-        </swiper>
+              </swiper-item>
+            </block>
+          </swiper>
+        </block>
+        <view wx:else class="empty-state">当前赛事还没有焦点报道。</view>
       </view>
 
       <view class="section">
         <text class="section-title">赛事新闻</text>
         <text class="section-subtitle">新闻按平台排序展示，可结合流量数据和人工置顶灵活调整。</text>
 
-        <view class="news-list">
+        <view wx:if="{{newsList.length}}" class="news-list">
           <block wx:for="{{newsList}}" wx:key="newsId">
             <view class="news-card panel" bindtap="openNewsDetail" data-news-id="{{item.newsId}}">
               <image class="news-card__image" src="{{item.coverImage}}" mode="aspectFill"></image>
@@ -58,6 +80,7 @@
             </view>
           </block>
         </view>
+        <view wx:else class="empty-state panel">当前赛事暂时还没有新闻内容。</view>
       </view>
     </view>
     <bottom-tab-bar current="home"></bottom-tab-bar>

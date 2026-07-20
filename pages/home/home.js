@@ -2,6 +2,7 @@ const {
   getEvents,
   getDefaultEventId,
   getEventById,
+  getEventOverview,
   getFeaturedNews,
   getNewsByEvent,
 } = require('../../data/index');
@@ -11,6 +12,7 @@ Page({
     events: [],
     activeEventId: '',
     currentEvent: null,
+    overview: null,
     featuredNews: [],
     newsList: [],
   },
@@ -24,12 +26,14 @@ Page({
 
   syncEventContent(eventId) {
     const currentEvent = getEventById(eventId);
+    const overview = getEventOverview(eventId);
     const featuredNews = getFeaturedNews(eventId);
     const newsList = getNewsByEvent(eventId);
 
     this.setData({
       activeEventId: eventId,
       currentEvent,
+      overview,
       featuredNews,
       newsList,
     });

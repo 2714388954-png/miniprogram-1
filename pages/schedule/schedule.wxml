@@ -14,6 +14,28 @@
         </block>
       </scroll-view>
 
+      <view wx:if="{{currentEvent}}" class="page-intro panel">
+        <view class="page-intro__head">
+          <text class="section-title">{{currentEvent.eventName}}</text>
+          <text class="page-intro__badge">{{overview.statusLabel}}</text>
+        </view>
+        <text class="section-subtitle">{{currentEvent.description}}</text>
+        <view class="page-intro__stats">
+          <view class="page-intro__stat">
+            <text class="page-intro__value">{{overview.totalMatches}}</text>
+            <text class="page-intro__label">总场次</text>
+          </view>
+          <view class="page-intro__stat">
+            <text class="page-intro__value">{{overview.finishedMatches}}</text>
+            <text class="page-intro__label">已赛</text>
+          </view>
+          <view class="page-intro__stat">
+            <text class="page-intro__value">{{overview.pendingMatches}}</text>
+            <text class="page-intro__label">未赛</text>
+          </view>
+        </view>
+      </view>
+
       <block wx:for="{{stageGroups}}" wx:key="stageName">
         <view class="stage-section">
           <view class="stage-heading">
@@ -38,6 +60,8 @@
           </view>
         </view>
       </block>
+
+      <view wx:if="{{!stageGroups.length}}" class="empty-state panel">当前赛事还没有录入赛程赛果。</view>
     </view>
     <bottom-tab-bar current="schedule"></bottom-tab-bar>
   </view>

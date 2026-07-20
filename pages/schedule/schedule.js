@@ -1,19 +1,33 @@
-const { getEvents, getDefaultEventId, getGroupedMatchesByEvent } = require('../../data/index');
+const {
+  getEvents,
+  getDefaultEventId,
+  getEventById,
+  getEventOverview,
+  getGroupedMatchesByEvent,
+} = require('../../data/index');
 
 Page({
   data: {
     events: [],
     activeEventId: '',
+    currentEvent: null,
+    overview: null,
     stageGroups: [],
   },
 
   onLoad() {
     const events = getEvents();
     const activeEventId = getDefaultEventId();
+    this.syncPage(events, activeEventId);
+  },
+
+  syncPage(events, eventId) {
     this.setData({
       events,
-      activeEventId,
-      stageGroups: getGroupedMatchesByEvent(activeEventId),
+      activeEventId: eventId,
+      currentEvent: getEventById(eventId),
+      overview: getEventOverview(eventId),
+      stageGroups: getGroupedMatchesByEvent(eventId),
     });
   },
 
@@ -23,9 +37,6 @@ Page({
       return;
     }
 
-    this.setData({
-      activeEventId: eventId,
-      stageGroups: getGroupedMatchesByEvent(eventId),
-    });
+    this.syncPage(this.data.events, eventId);
   },
 });

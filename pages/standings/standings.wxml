@@ -14,6 +14,14 @@
         </block>
       </scroll-view>
 
+      <view wx:if="{{currentEvent}}" class="ranking-summary panel">
+        <view class="ranking-summary__head">
+          <text class="section-title">{{currentEvent.eventName}}</text>
+          <text class="ranking-summary__badge">{{overview.standingsModeLabel}}</text>
+        </view>
+        <text class="section-subtitle">{{overview.eventTypeLabel}}，榜单会根据赛事赛制自动切换展示方式。</text>
+      </view>
+
       <block wx:if="{{standings && standings.type === 'league'}}">
         <view class="ranking-panel panel">
           <view class="ranking-head">
@@ -80,6 +88,8 @@
           </view>
         </block>
       </block>
+
+      <view wx:if="{{!standings}}" class="empty-state panel">当前赛事还没有积分榜数据。</view>
     </view>
     <bottom-tab-bar current="standings"></bottom-tab-bar>
   </view>

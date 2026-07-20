@@ -1,4 +1,10 @@
-const { getEvents, getDefaultEventId, getStatsByEvent } = require('../../data/index');
+const {
+  getEvents,
+  getDefaultEventId,
+  getEventById,
+  getEventOverview,
+  getStatsByEvent,
+} = require('../../data/index');
 
 const statTabs = [
   { key: 'scorers', label: '进球榜', unit: '球' },
@@ -11,6 +17,8 @@ Page({
   data: {
     events: [],
     activeEventId: '',
+    currentEvent: null,
+    overview: null,
     activeStatKey: 'scorers',
     statTabs,
     statRows: [],
@@ -29,6 +37,8 @@ Page({
     const activeTab = statTabs.find((item) => item.key === statKey) || statTabs[0];
     this.setData({
       activeEventId: eventId,
+      currentEvent: getEventById(eventId),
+      overview: getEventOverview(eventId),
       activeStatKey: activeTab.key,
       statRows: stats[activeTab.key] || [],
       statUnit: activeTab.unit,

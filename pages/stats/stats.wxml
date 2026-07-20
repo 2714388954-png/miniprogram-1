@@ -14,6 +14,14 @@
         </block>
       </scroll-view>
 
+      <view wx:if="{{currentEvent}}" class="stats-summary panel">
+        <view class="stats-summary__head">
+          <text class="section-title">{{currentEvent.eventName}}</text>
+          <text class="stats-summary__badge">{{overview.topScorer}}</text>
+        </view>
+        <text class="section-subtitle">球员榜单按当前赛事独立统计，后续只需补充数据即可继续复用。</text>
+      </view>
+
       <view class="segmented">
         <block wx:for="{{statTabs}}" wx:key="key">
           <view
