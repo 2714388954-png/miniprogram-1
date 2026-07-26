@@ -54,23 +54,19 @@
 }
 
 .match-card__score {
-  width: 108rpx;
-  height: 108rpx;
+  min-width: 150rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  border-radius: 999rpx;
-  background: #eef3f9;
   color: var(--theme-text-secondary);
-  font-size: 32rpx;
+  font-size: 40rpx;
   font-weight: 700;
   line-height: 1;
   flex: none;
 }
 
 .match-card__score--done {
-  background: var(--theme-primary-soft);
   color: var(--theme-primary);
 }
 
