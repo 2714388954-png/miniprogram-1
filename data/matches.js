@@ -11,6 +11,15 @@ const matches = [
     matchTime: '2026-03-15 16:00',
     location: '南区球场',
     status: 'finished',
+    reportNewsId: 'news-001',
+    reportTitle: '经管学院补时绝杀，首轮拿下关键三分',
+    scorers: [
+      { team: '经管学院', player: '张三', minute: '28′' },
+      { team: '电气学院', player: '李明', minute: '54′' },
+      { team: '经管学院', player: '王航', minute: '89′' },
+    ],
+    report:
+      '经管学院与电气学院在首轮焦点战中展开高强度对抗。双方下半场一度战成平局，经管学院在终场前通过快速反击完成绝杀，拿下关键三分。',
   },
   {
     matchId: 'match-002',
@@ -24,6 +33,11 @@ const matches = [
     matchTime: '2026-03-15 18:00',
     location: '虎溪球场',
     status: 'finished',
+    reportNewsId: '',
+    reportTitle: '',
+    scorers: [],
+    report:
+      '两队在中场控制和防线组织上都较为稳健，虽然制造出几次不错机会，但最终未能改写比分，以一场平局结束首轮比赛。',
   },
   {
     matchId: 'match-003',
@@ -37,6 +51,10 @@ const matches = [
     matchTime: '2026-03-22 15:00',
     location: '南区球场',
     status: 'not_started',
+    reportNewsId: '',
+    reportTitle: '',
+    scorers: [],
+    report: '本场比赛尚未开始，赛后将更新进球球员与简短战报。',
   },
   {
     matchId: 'match-004',
@@ -50,6 +68,10 @@ const matches = [
     matchTime: '2026-03-22 17:00',
     location: '虎溪球场',
     status: 'not_started',
+    reportNewsId: '',
+    reportTitle: '',
+    scorers: [],
+    report: '本场比赛尚未开始，赛后将更新进球球员与简短战报。',
   },
   {
     matchId: 'cup-001',
@@ -63,6 +85,14 @@ const matches = [
     matchTime: '2026-04-10 15:00',
     location: 'A区球场',
     status: 'finished',
+    reportNewsId: 'news-004',
+    reportTitle: '新生杯分组抽签结果出炉',
+    scorers: [
+      { team: '计算机学院', player: '陈宇', minute: '33′' },
+      { team: '外国语学院', player: '赵辰', minute: '71′' },
+    ],
+    report:
+      '新生杯A组首轮比赛节奏紧凑，计算机学院上半场率先破门，外国语学院下半场抓住定位球机会扳平比分，双方各取一分。',
   },
   {
     matchId: 'cup-002',
@@ -76,6 +106,14 @@ const matches = [
     matchTime: '2026-04-10 17:00',
     location: 'A区球场',
     status: 'finished',
+    reportNewsId: '',
+    reportTitle: '',
+    scorers: [
+      { team: '法学院', player: '刘博', minute: '17′' },
+      { team: '法学院', player: '周凯', minute: '62′' },
+    ],
+    report:
+      '法学院在上下半场各入一球，整体防守也保持稳定，没有给对手留下太多机会，顺利拿到小组赛开门红。',
   },
   {
     matchId: 'cup-003',
@@ -89,6 +127,10 @@ const matches = [
     matchTime: '2026-04-20 16:00',
     location: '主体育场',
     status: 'not_started',
+    reportNewsId: '',
+    reportTitle: '',
+    scorers: [],
+    report: '半决赛对阵待小组赛结束后确定，比赛结束后将更新详细信息。',
   },
   {
     matchId: 'cup-004',
@@ -102,6 +144,10 @@ const matches = [
     matchTime: '2026-04-27 19:00',
     location: '主体育场',
     status: 'not_started',
+    reportNewsId: '',
+    reportTitle: '',
+    scorers: [],
+    report: '决赛将在淘汰赛结束后确定对阵双方，届时会补充最终战报内容。',
   },
 ];
 
