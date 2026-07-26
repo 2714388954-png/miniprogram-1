@@ -19,21 +19,7 @@
           <text class="section-title">{{currentEvent.eventName}}</text>
           <text class="page-intro__badge">{{overview.statusLabel}}</text>
         </view>
-        <text class="section-subtitle">{{currentEvent.description}}</text>
-        <view class="page-intro__stats">
-          <view class="page-intro__stat">
-            <text class="page-intro__value">{{overview.totalMatches}}</text>
-            <text class="page-intro__label">总场次</text>
-          </view>
-          <view class="page-intro__stat">
-            <text class="page-intro__value">{{overview.finishedMatches}}</text>
-            <text class="page-intro__label">已赛</text>
-          </view>
-          <view class="page-intro__stat">
-            <text class="page-intro__value">{{overview.pendingMatches}}</text>
-            <text class="page-intro__label">未赛</text>
-          </view>
-        </view>
+        <text class="section-subtitle">按比赛轮次或阶段展示赛程与赛果。</text>
       </view>
 
       <block wx:for="{{stageGroups}}" wx:key="stageName">
