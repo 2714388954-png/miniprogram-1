@@ -4,6 +4,52 @@ const { matches } = require('../data/matches');
 const { standings } = require('../data/standings');
 const { stats } = require('../data/stats');
 
+function normalizeMaybeEmpty(value) {
+  return value === 'none' ? '' : value;
+}
+
+function normalizeMatch(match) {
+  if (!match) {
+    return match;
+  }
+
+  return {
+    ...match,
+    groupName: normalizeMaybeEmpty(match.groupName),
+    reportNewsId: normalizeMaybeEmpty(match.reportNewsId),
+    reportTitle: normalizeMaybeEmpty(match.reportTitle),
+  };
+}
+
+function normalizeNewsItem(item) {
+  if (!item) {
+    return item;
+  }
+
+  return {
+    ...item,
+    relatedMatchId: normalizeMaybeEmpty(item.relatedMatchId),
+  };
+}
+
+function normalizeStandingsPayload(payload) {
+  if (!payload) {
+    return payload;
+  }
+
+  if (payload.type === 'group') {
+    return {
+      ...payload,
+      groups: (payload.groups || []).map((group) => ({
+        ...group,
+        groupName: normalizeMaybeEmpty(group.groupName),
+      })),
+    };
+  }
+
+  return payload;
+}
+
 function getEvents() {
   return events.slice();
 }
@@ -50,7 +96,8 @@ function getNewsByEvent(eventId) {
       }
 
       return a.publishTime < b.publishTime ? 1 : -1;
-    });
+    })
+    .map(normalizeNewsItem);
 }
 
 function getFeaturedNews(eventId) {
@@ -58,11 +105,11 @@ function getFeaturedNews(eventId) {
 }
 
 function getNewsById(newsId) {
-  return news.find((item) => item.newsId === newsId) || null;
+  return normalizeNewsItem(news.find((item) => item.newsId === newsId) || null);
 }
 
 function getMatchesByEvent(eventId) {
-  return matches.filter((item) => item.eventId === eventId);
+  return matches.filter((item) => item.eventId === eventId).map(normalizeMatch);
 }
 
 function getGroupedMatchesByEvent(eventId) {
@@ -82,7 +129,7 @@ function getGroupedMatchesByEvent(eventId) {
 }
 
 function getStandingsByEvent(eventId) {
-  return standings[eventId] || null;
+  return normalizeStandingsPayload(standings[eventId] || null);
 }
 
 function getStatsByEvent(eventId) {

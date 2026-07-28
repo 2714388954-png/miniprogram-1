@@ -16,6 +16,8 @@ page {
   background: linear-gradient(180deg, #eef5ff 0%, #f7fbff 260rpx, #f4f8fc 100%);
   color: var(--theme-text);
   font-size: 28rpx;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 view,
@@ -28,16 +30,22 @@ image {
 }
 
 .app-page {
-  min-height: 100vh;
+  min-height: 100%;
   padding-bottom: 168rpx;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .page-scroll {
-  height: 100vh;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .page-shell {
   padding: 24rpx var(--page-padding) 0;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .section-title {

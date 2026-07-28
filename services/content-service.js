@@ -1,44 +1,68 @@
+const cloudConfig = require('../config/cloud');
 const localContentService = require('./local-content-service');
+const cloudContentService = require('./cloud-content-service');
+
+function shouldUseCloud() {
+  if (!cloudConfig.enabled || typeof getApp !== 'function') {
+    return false;
+  }
+
+  const app = getApp();
+  return app && app.globalData && app.globalData.dataSource === 'cloud';
+}
+
+async function call(methodName, ...args) {
+  if (!shouldUseCloud()) {
+    return localContentService[methodName](...args);
+  }
+
+  try {
+    return await cloudContentService[methodName](...args);
+  } catch (error) {
+    console.warn(`Cloud content service failed: ${methodName}. Fallback to local data.`, error);
+    return localContentService[methodName](...args);
+  }
+}
 
 const service = {
-  async getEvents() {
-    return localContentService.getEvents();
+  getEvents() {
+    return call('getEvents');
   },
 
-  async getDefaultEventId() {
-    return localContentService.getDefaultEventId();
+  getDefaultEventId() {
+    return call('getDefaultEventId');
   },
 
-  async getEventById(eventId) {
-    return localContentService.getEventById(eventId);
+  getEventById(eventId) {
+    return call('getEventById', eventId);
   },
 
-  async getEventOverview(eventId) {
-    return localContentService.getEventOverview(eventId);
+  getEventOverview(eventId) {
+    return call('getEventOverview', eventId);
   },
 
-  async getFeaturedNews(eventId) {
-    return localContentService.getFeaturedNews(eventId);
+  getFeaturedNews(eventId) {
+    return call('getFeaturedNews', eventId);
   },
 
-  async getNewsByEvent(eventId) {
-    return localContentService.getNewsByEvent(eventId);
+  getNewsByEvent(eventId) {
+    return call('getNewsByEvent', eventId);
   },
 
-  async getNewsById(newsId) {
-    return localContentService.getNewsById(newsId);
+  getNewsById(newsId) {
+    return call('getNewsById', newsId);
   },
 
-  async getGroupedMatchesByEvent(eventId) {
-    return localContentService.getGroupedMatchesByEvent(eventId);
+  getGroupedMatchesByEvent(eventId) {
+    return call('getGroupedMatchesByEvent', eventId);
   },
 
-  async getStandingsByEvent(eventId) {
-    return localContentService.getStandingsByEvent(eventId);
+  getStandingsByEvent(eventId) {
+    return call('getStandingsByEvent', eventId);
   },
 
-  async getStatsByEvent(eventId) {
-    return localContentService.getStatsByEvent(eventId);
+  getStatsByEvent(eventId) {
+    return call('getStatsByEvent', eventId);
   },
 };
 

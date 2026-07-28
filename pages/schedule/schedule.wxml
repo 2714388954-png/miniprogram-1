@@ -57,30 +57,30 @@
   <view class="match-detail-sheet" catchtap="stopOverlayScroll">
     <view class="match-detail-sheet__handle"></view>
     <view class="match-detail-sheet__head">
-      <text class="match-detail-sheet__stage">{{selectedMatch.stage}}</text>
-      <text class="match-detail-sheet__title">比赛详情</text>
+      <view class="match-detail-sheet__stage">{{selectedMatch.stage}}</view>
+      <view class="match-detail-sheet__title">比赛详情</view>
     </view>
 
     <view class="match-detail-score">
-      <text class="match-detail-score__team">{{selectedMatch.homeTeam}}</text>
+      <view class="match-detail-score__team">{{selectedMatch.homeTeam}}</view>
       <view class="match-detail-score__center">
-        <text class="match-detail-score__value {{selectedMatch.status === 'finished' ? 'match-detail-score__value--done' : ''}}">
+        <view class="match-detail-score__value {{selectedMatch.status === 'finished' ? 'match-detail-score__value--done' : ''}}">
           {{selectedMatch.status === 'finished' ? selectedMatch.homeScore + ' : ' + selectedMatch.awayScore : 'VS'}}
-        </text>
-        <text class="match-detail-score__meta">{{selectedMatch.matchTime}} · {{selectedMatch.location}}</text>
+        </view>
+        <view class="match-detail-score__meta">{{selectedMatch.matchTime}} · {{selectedMatch.location}}</view>
       </view>
-      <text class="match-detail-score__team match-detail-score__team--right">{{selectedMatch.awayTeam}}</text>
+      <view class="match-detail-score__team match-detail-score__team--right">{{selectedMatch.awayTeam}}</view>
     </view>
 
     <view class="match-detail-block">
-      <text class="match-detail-block__title">进球球员</text>
+      <view class="match-detail-block__title">进球球员</view>
       <block wx:if="{{selectedMatch.scorers.length}}">
         <block wx:for="{{selectedMatch.scorers}}" wx:key="player">
           <view class="match-detail-scorer">
-            <text class="match-detail-scorer__minute">{{item.minute}}</text>
+            <view class="match-detail-scorer__minute">{{item.minute}}</view>
             <view class="match-detail-scorer__main">
-              <text class="match-detail-scorer__player">{{item.player}}</text>
-              <text class="match-detail-scorer__team">{{item.team}}</text>
+              <view class="match-detail-scorer__player">{{item.player}}</view>
+              <view class="match-detail-scorer__team">{{item.team}}</view>
             </view>
           </view>
         </block>
@@ -89,11 +89,11 @@
     </view>
 
     <view class="match-detail-block">
-      <text class="match-detail-block__title">比赛战报</text>
-      <text class="match-detail-report">{{selectedMatch.report}}</text>
+      <view class="match-detail-block__title">比赛战报</view>
+      <view class="match-detail-report">{{selectedMatch.report}}</view>
       <view wx:if="{{selectedMatch.reportNewsId}}" class="match-detail-report-link" bindtap="handleReportOpen">
-        <text class="match-detail-report-link__label">查看完整战报</text>
-        <text class="match-detail-report-link__title">{{selectedMatch.reportTitle}}</text>
+        <view class="match-detail-report-link__label">查看完整战报</view>
+        <view class="match-detail-report-link__title">{{selectedMatch.reportTitle}}</view>
       </view>
     </view>
 
