@@ -1,10 +1,4 @@
-const {
-  getEvents,
-  getDefaultEventId,
-  getEventById,
-  getEventOverview,
-  getStatsByEvent,
-} = require('../../data/index');
+const contentService = require('../../services/content-service');
 
 const statTabs = [
   { key: 'scorers', label: '进球榜', unit: '球' },
@@ -25,39 +19,44 @@ Page({
     statUnit: '球',
   },
 
-  onLoad() {
-    const events = getEvents();
-    const activeEventId = getDefaultEventId();
+  async onLoad() {
+    const events = await contentService.getEvents();
+    const activeEventId = await contentService.getDefaultEventId();
     this.setData({ events, activeEventId });
-    this.syncStats(activeEventId, 'scorers');
+    await this.syncStats(activeEventId, 'scorers');
   },
 
-  syncStats(eventId, statKey) {
-    const stats = getStatsByEvent(eventId);
+  async syncStats(eventId, statKey) {
+    const stats = await contentService.getStatsByEvent(eventId);
     const activeTab = statTabs.find((item) => item.key === statKey) || statTabs[0];
+    const [currentEvent, overview] = await Promise.all([
+      contentService.getEventById(eventId),
+      contentService.getEventOverview(eventId),
+    ]);
+
     this.setData({
       activeEventId: eventId,
-      currentEvent: getEventById(eventId),
-      overview: getEventOverview(eventId),
+      currentEvent,
+      overview,
       activeStatKey: activeTab.key,
       statRows: stats[activeTab.key] || [],
       statUnit: activeTab.unit,
     });
   },
 
-  handleEventSwitch(event) {
+  async handleEventSwitch(event) {
     const { eventId } = event.currentTarget.dataset;
     if (!eventId || eventId === this.data.activeEventId) {
       return;
     }
-    this.syncStats(eventId, this.data.activeStatKey);
+    await this.syncStats(eventId, this.data.activeStatKey);
   },
 
-  handleStatSwitch(event) {
+  async handleStatSwitch(event) {
     const { statKey } = event.currentTarget.dataset;
     if (!statKey || statKey === this.data.activeStatKey) {
       return;
     }
-    this.syncStats(this.data.activeEventId, statKey);
+    await this.syncStats(this.data.activeEventId, statKey);
   },
 });

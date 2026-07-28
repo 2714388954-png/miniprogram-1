@@ -1,12 +1,12 @@
-const { getNewsById } = require('../../data/index');
+const contentService = require('../../services/content-service');
 
 Page({
   data: {
     newsItem: null,
   },
 
-  onLoad(options) {
-    const newsItem = getNewsById(options.newsId);
+  async onLoad(options) {
+    const newsItem = await contentService.getNewsById(options.newsId);
     this.setData({ newsItem });
   },
 });

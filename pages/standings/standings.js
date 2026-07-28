@@ -1,10 +1,4 @@
-const {
-  getEvents,
-  getDefaultEventId,
-  getEventById,
-  getEventOverview,
-  getStandingsByEvent,
-} = require('../../data/index');
+const contentService = require('../../services/content-service');
 
 Page({
   data: {
@@ -15,28 +9,34 @@ Page({
     standings: null,
   },
 
-  onLoad() {
-    const events = getEvents();
-    const activeEventId = getDefaultEventId();
-    this.syncPage(events, activeEventId);
+  async onLoad() {
+    const events = await contentService.getEvents();
+    const activeEventId = await contentService.getDefaultEventId();
+    await this.syncPage(events, activeEventId);
   },
 
-  syncPage(events, eventId) {
+  async syncPage(events, eventId) {
+    const [currentEvent, overview, standings] = await Promise.all([
+      contentService.getEventById(eventId),
+      contentService.getEventOverview(eventId),
+      contentService.getStandingsByEvent(eventId),
+    ]);
+
     this.setData({
       events,
       activeEventId: eventId,
-      currentEvent: getEventById(eventId),
-      overview: getEventOverview(eventId),
-      standings: getStandingsByEvent(eventId),
+      currentEvent,
+      overview,
+      standings,
     });
   },
 
-  handleEventSwitch(event) {
+  async handleEventSwitch(event) {
     const { eventId } = event.currentTarget.dataset;
     if (!eventId || eventId === this.data.activeEventId) {
       return;
     }
 
-    this.syncPage(this.data.events, eventId);
+    await this.syncPage(this.data.events, eventId);
   },
 });
