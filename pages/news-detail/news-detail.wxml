@@ -1,7 +1,11 @@
 <navigation-bar title="新闻详情" color="#15314b" background="transparent"></navigation-bar>
 <scroll-view class="page-scroll" scroll-y>
   <view class="page-shell detail-page">
-    <block wx:if="{{newsItem}}">
+    <view wx:if="{{isLoading}}" class="loading-panel panel">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载新闻中...</text>
+    </view>
+    <block wx:elif="{{newsItem}}">
       <view class="detail-header">
         <text class="detail-title">{{newsItem.title}}</text>
         <view class="detail-meta">

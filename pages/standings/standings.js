@@ -7,28 +7,39 @@ Page({
     currentEvent: null,
     overview: null,
     standings: null,
+    isLoading: true,
   },
 
   async onLoad() {
-    const events = await contentService.getEvents();
-    const activeEventId = await contentService.getDefaultEventId();
-    await this.syncPage(events, activeEventId);
+    this.setData({ isLoading: true });
+    try {
+      const events = await contentService.getEvents();
+      const activeEventId = await contentService.getDefaultEventId();
+      await this.syncPage(events, activeEventId);
+    } finally {
+      this.setData({ isLoading: false });
+    }
   },
 
   async syncPage(events, eventId) {
-    const [currentEvent, overview, standings] = await Promise.all([
-      contentService.getEventById(eventId),
-      contentService.getEventOverview(eventId),
-      contentService.getStandingsByEvent(eventId),
-    ]);
+    this.setData({ isLoading: true });
+    try {
+      const [currentEvent, overview, standings] = await Promise.all([
+        contentService.getEventById(eventId),
+        contentService.getEventOverview(eventId),
+        contentService.getStandingsByEvent(eventId),
+      ]);
 
-    this.setData({
-      events,
-      activeEventId: eventId,
-      currentEvent,
-      overview,
-      standings,
-    });
+      this.setData({
+        events,
+        activeEventId: eventId,
+        currentEvent,
+        overview,
+        standings,
+      });
+    } finally {
+      this.setData({ isLoading: false });
+    }
   },
 
   async handleEventSwitch(event) {

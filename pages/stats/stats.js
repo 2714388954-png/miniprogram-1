@@ -17,31 +17,42 @@ Page({
     statTabs,
     statRows: [],
     statUnit: '球',
+    isLoading: true,
   },
 
   async onLoad() {
-    const events = await contentService.getEvents();
-    const activeEventId = await contentService.getDefaultEventId();
-    this.setData({ events, activeEventId });
-    await this.syncStats(activeEventId, 'scorers');
+    this.setData({ isLoading: true });
+    try {
+      const events = await contentService.getEvents();
+      const activeEventId = await contentService.getDefaultEventId();
+      this.setData({ events, activeEventId });
+      await this.syncStats(activeEventId, 'scorers');
+    } finally {
+      this.setData({ isLoading: false });
+    }
   },
 
   async syncStats(eventId, statKey) {
-    const stats = await contentService.getStatsByEvent(eventId);
-    const activeTab = statTabs.find((item) => item.key === statKey) || statTabs[0];
-    const [currentEvent, overview] = await Promise.all([
-      contentService.getEventById(eventId),
-      contentService.getEventOverview(eventId),
-    ]);
+    this.setData({ isLoading: true });
+    try {
+      const stats = await contentService.getStatsByEvent(eventId);
+      const activeTab = statTabs.find((item) => item.key === statKey) || statTabs[0];
+      const [currentEvent, overview] = await Promise.all([
+        contentService.getEventById(eventId),
+        contentService.getEventOverview(eventId),
+      ]);
 
-    this.setData({
-      activeEventId: eventId,
-      currentEvent,
-      overview,
-      activeStatKey: activeTab.key,
-      statRows: stats[activeTab.key] || [],
-      statUnit: activeTab.unit,
-    });
+      this.setData({
+        activeEventId: eventId,
+        currentEvent,
+        overview,
+        activeStatKey: activeTab.key,
+        statRows: stats[activeTab.key] || [],
+        statUnit: activeTab.unit,
+      });
+    } finally {
+      this.setData({ isLoading: false });
+    }
   },
 
   async handleEventSwitch(event) {

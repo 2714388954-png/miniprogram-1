@@ -14,7 +14,12 @@
         </block>
       </scroll-view>
 
-      <view wx:if="{{currentEvent}}" class="ranking-summary panel">
+      <view wx:if="{{isLoading}}" class="loading-panel panel">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">加载积分中...</text>
+      </view>
+
+      <view wx:if="{{!isLoading && currentEvent}}" class="ranking-summary panel">
         <view class="ranking-summary__head">
           <text class="section-title">{{currentEvent.eventName}}</text>
           <text class="ranking-summary__badge">{{overview.standingsModeLabel}}</text>
@@ -22,11 +27,11 @@
         <text class="section-subtitle">{{overview.eventTypeLabel}}，榜单会根据赛事赛制自动切换展示方式。</text>
       </view>
 
-      <block wx:if="{{standings && standings.type === 'league'}}">
+      <block wx:if="{{!isLoading && standings && standings.type === 'league'}}">
         <view class="ranking-panel panel">
           <view class="ranking-head">
             <text class="section-title">联赛积分</text>
-            <text class="section-subtitle">前几名进行轻度高亮，整体保持简洁清晰。</text>
+            <text class="section-subtitle">前几名做轻度高亮，整体保持简约清晰。</text>
           </view>
           <view class="table">
             <view class="table__row table__row--head">
@@ -55,7 +60,7 @@
         </view>
       </block>
 
-      <block wx:if="{{standings && standings.type === 'group'}}">
+      <block wx:if="{{!isLoading && standings && standings.type === 'group'}}">
         <block wx:for="{{standings.groups}}" wx:key="groupName">
           <view class="ranking-panel panel group-panel">
             <view class="ranking-head">
@@ -89,7 +94,7 @@
         </block>
       </block>
 
-      <view wx:if="{{!standings}}" class="empty-state panel">当前赛事还没有积分榜数据。</view>
+      <view wx:if="{{!isLoading && !standings}}" class="empty-state panel">当前赛事还没有积分榜数据。</view>
     </view>
     <bottom-tab-bar current="standings"></bottom-tab-bar>
   </view>

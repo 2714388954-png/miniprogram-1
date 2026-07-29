@@ -2,6 +2,8 @@ const cloudConfig = require('../config/cloud');
 const localContentService = require('./local-content-service');
 const cloudContentService = require('./cloud-content-service');
 
+const cacheStore = new Map();
+
 function shouldUseCloud() {
   if (!cloudConfig.enabled || typeof getApp !== 'function') {
     return false;
@@ -11,16 +13,42 @@ function shouldUseCloud() {
   return app && app.globalData && app.globalData.dataSource === 'cloud';
 }
 
+function getDataSourceKey() {
+  return shouldUseCloud() ? 'cloud' : 'local';
+}
+
+function buildCacheKey(methodName, args) {
+  return `${getDataSourceKey()}:${methodName}:${JSON.stringify(args || [])}`;
+}
+
 async function call(methodName, ...args) {
-  if (!shouldUseCloud()) {
-    return localContentService[methodName](...args);
+  const cacheKey = buildCacheKey(methodName, args);
+  if (cacheStore.has(cacheKey)) {
+    return cacheStore.get(cacheKey);
   }
 
+  const pendingRequest = (async () => {
+    if (!shouldUseCloud()) {
+      return localContentService[methodName](...args);
+    }
+
+    try {
+      return await cloudContentService[methodName](...args);
+    } catch (error) {
+      console.warn(`Cloud content service failed: ${methodName}. Fallback to local data.`, error);
+      return localContentService[methodName](...args);
+    }
+  })();
+
+  cacheStore.set(cacheKey, pendingRequest);
+
   try {
-    return await cloudContentService[methodName](...args);
+    const result = await pendingRequest;
+    cacheStore.set(cacheKey, Promise.resolve(result));
+    return result;
   } catch (error) {
-    console.warn(`Cloud content service failed: ${methodName}. Fallback to local data.`, error);
-    return localContentService[methodName](...args);
+    cacheStore.delete(cacheKey);
+    throw error;
   }
 }
 
@@ -63,6 +91,10 @@ const service = {
 
   getStatsByEvent(eventId) {
     return call('getStatsByEvent', eventId);
+  },
+
+  clearCache() {
+    cacheStore.clear();
   },
 };
 

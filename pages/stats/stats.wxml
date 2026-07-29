@@ -14,7 +14,12 @@
         </block>
       </scroll-view>
 
-      <view wx:if="{{currentEvent}}" class="stats-summary panel">
+      <view wx:if="{{isLoading}}" class="loading-panel panel">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">加载榜单中...</text>
+      </view>
+
+      <view wx:if="{{!isLoading && currentEvent}}" class="stats-summary panel">
         <view class="stats-summary__head">
           <text class="section-title">{{currentEvent.eventName}}</text>
           <text class="stats-summary__badge">{{overview.topScorer}}</text>
@@ -22,7 +27,7 @@
         <text class="section-subtitle">球员榜单按当前赛事独立统计，后续只需补充数据即可继续复用。</text>
       </view>
 
-      <view class="segmented">
+      <view wx:if="{{!isLoading}}" class="segmented">
         <block wx:for="{{statTabs}}" wx:key="key">
           <view
             class="segmented__item {{activeStatKey === item.key ? 'segmented__item--active' : ''}}"
@@ -34,7 +39,7 @@
         </block>
       </view>
 
-      <view class="stats-panel panel">
+      <view wx:if="{{!isLoading}}" class="stats-panel panel">
         <view class="stats-head">
           <text class="section-title">球员榜单</text>
           <text class="section-subtitle">按当前赛事独立统计，后续只需更新数据即可。</text>

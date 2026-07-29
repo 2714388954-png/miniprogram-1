@@ -14,7 +14,12 @@
         </block>
       </scroll-view>
 
-      <view wx:if="{{currentEvent}}" class="page-intro panel">
+      <view wx:if="{{isLoading}}" class="loading-panel panel">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">加载赛程中...</text>
+      </view>
+
+      <view wx:if="{{!isLoading && currentEvent}}" class="page-intro panel">
         <view class="page-intro__head">
           <text class="section-title">{{currentEvent.eventName}}</text>
           <text class="page-intro__badge">{{overview.statusLabel}}</text>
@@ -22,7 +27,7 @@
         <text class="section-subtitle">按比赛轮次或阶段展示赛程与赛果，点击比赛卡片可查看详细信息。</text>
       </view>
 
-      <block wx:for="{{stageGroups}}" wx:key="stageName">
+      <block wx:if="{{!isLoading}}" wx:for="{{stageGroups}}" wx:key="stageName">
         <view class="stage-section">
           <view class="stage-heading">
             <text class="section-title">{{item.stageName}}</text>
@@ -47,7 +52,7 @@
         </view>
       </block>
 
-      <view wx:if="{{!stageGroups.length}}" class="empty-state panel">当前赛事还没有录入赛程赛果。</view>
+      <view wx:if="{{!isLoading && !stageGroups.length}}" class="empty-state panel">当前赛事还没有录入赛程赛果。</view>
     </view>
     <bottom-tab-bar current="schedule"></bottom-tab-bar>
   </view>
@@ -56,46 +61,49 @@
 <view wx:if="{{showMatchDetail && selectedMatch}}" class="match-detail-mask" bindtap="handleMatchClose">
   <view class="match-detail-sheet" catchtap="stopOverlayScroll">
     <view class="match-detail-sheet__handle"></view>
-    <view class="match-detail-sheet__head">
-      <view class="match-detail-sheet__stage">{{selectedMatch.stage}}</view>
-      <view class="match-detail-sheet__title">比赛详情</view>
-    </view>
 
-    <view class="match-detail-score">
-      <view class="match-detail-score__team">{{selectedMatch.homeTeam}}</view>
-      <view class="match-detail-score__center">
-        <view class="match-detail-score__value {{selectedMatch.status === 'finished' ? 'match-detail-score__value--done' : ''}}">
-          {{selectedMatch.status === 'finished' ? selectedMatch.homeScore + ' : ' + selectedMatch.awayScore : 'VS'}}
-        </view>
-        <view class="match-detail-score__meta">{{selectedMatch.matchTime}} · {{selectedMatch.location}}</view>
+    <scroll-view class="match-detail-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+      <view class="match-detail-sheet__head">
+        <view class="match-detail-sheet__stage">{{selectedMatch.stage}}</view>
+        <view class="match-detail-sheet__title">比赛详情</view>
       </view>
-      <view class="match-detail-score__team match-detail-score__team--right">{{selectedMatch.awayTeam}}</view>
-    </view>
 
-    <view class="match-detail-block">
-      <view class="match-detail-block__title">进球球员</view>
-      <block wx:if="{{selectedMatch.scorers.length}}">
-        <block wx:for="{{selectedMatch.scorers}}" wx:key="player">
-          <view class="match-detail-scorer">
-            <view class="match-detail-scorer__minute">{{item.minute}}</view>
-            <view class="match-detail-scorer__main">
-              <view class="match-detail-scorer__player">{{item.player}}</view>
-              <view class="match-detail-scorer__team">{{item.team}}</view>
-            </view>
+      <view class="match-detail-score">
+        <view class="match-detail-score__team">{{selectedMatch.homeTeam}}</view>
+        <view class="match-detail-score__center">
+          <view class="match-detail-score__value {{selectedMatch.status === 'finished' ? 'match-detail-score__value--done' : ''}}">
+            {{selectedMatch.status === 'finished' ? selectedMatch.homeScore + ' : ' + selectedMatch.awayScore : 'VS'}}
           </view>
-        </block>
-      </block>
-      <view wx:else class="match-detail-empty">本场比赛暂无进球记录。</view>
-    </view>
-
-    <view class="match-detail-block">
-      <view class="match-detail-block__title">比赛战报</view>
-      <view class="match-detail-report">{{selectedMatch.report}}</view>
-      <view wx:if="{{selectedMatch.reportNewsId}}" class="match-detail-report-link" bindtap="handleReportOpen">
-        <view class="match-detail-report-link__label">查看完整战报</view>
-        <view class="match-detail-report-link__title">{{selectedMatch.reportTitle}}</view>
+          <view class="match-detail-score__meta">{{selectedMatch.matchTime}} · {{selectedMatch.location}}</view>
+        </view>
+        <view class="match-detail-score__team match-detail-score__team--right">{{selectedMatch.awayTeam}}</view>
       </view>
-    </view>
+
+      <view class="match-detail-block">
+        <view class="match-detail-block__title">进球球员</view>
+        <block wx:if="{{selectedMatch.scorers.length}}">
+          <block wx:for="{{selectedMatch.scorers}}" wx:key="player">
+            <view class="match-detail-scorer">
+              <view class="match-detail-scorer__minute">{{item.minute}}</view>
+              <view class="match-detail-scorer__main">
+                <view class="match-detail-scorer__player">{{item.player}}</view>
+                <view class="match-detail-scorer__team">{{item.team}}</view>
+              </view>
+            </view>
+          </block>
+        </block>
+        <view wx:else class="match-detail-empty">本场比赛暂无进球记录。</view>
+      </view>
+
+      <view class="match-detail-block">
+        <view class="match-detail-block__title">比赛战报</view>
+        <view class="match-detail-report">{{selectedMatch.report}}</view>
+        <view wx:if="{{selectedMatch.reportNewsId}}" class="match-detail-report-link" bindtap="handleReportOpen">
+          <view class="match-detail-report-link__label">查看完整战报</view>
+          <view class="match-detail-report-link__title">{{selectedMatch.reportTitle}}</view>
+        </view>
+      </view>
+    </scroll-view>
 
     <view class="match-detail-actions">
       <view class="match-detail-close" bindtap="handleMatchClose">关闭</view>

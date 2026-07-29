@@ -130,3 +130,37 @@ image {
   text-align: center;
   color: var(--theme-text-secondary);
 }
+
+.loading-panel {
+  margin-top: 20rpx;
+  padding: 54rpx 28rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18rpx;
+}
+
+.loading-spinner {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  border: 6rpx solid rgba(13, 95, 212, 0.14);
+  border-top-color: var(--theme-primary);
+  animation: spin 0.9s linear infinite;
+}
+
+.loading-text {
+  font-size: 24rpx;
+  color: var(--theme-text-secondary);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

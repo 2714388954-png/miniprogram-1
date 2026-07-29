@@ -9,30 +9,41 @@ Page({
     stageGroups: [],
     selectedMatch: null,
     showMatchDetail: false,
+    isLoading: true,
   },
 
   async onLoad() {
-    const events = await contentService.getEvents();
-    const activeEventId = await contentService.getDefaultEventId();
-    await this.syncPage(events, activeEventId);
+    this.setData({ isLoading: true });
+    try {
+      const events = await contentService.getEvents();
+      const activeEventId = await contentService.getDefaultEventId();
+      await this.syncPage(events, activeEventId);
+    } finally {
+      this.setData({ isLoading: false });
+    }
   },
 
   async syncPage(events, eventId) {
-    const [currentEvent, overview, stageGroups] = await Promise.all([
-      contentService.getEventById(eventId),
-      contentService.getEventOverview(eventId),
-      contentService.getGroupedMatchesByEvent(eventId),
-    ]);
+    this.setData({ isLoading: true });
+    try {
+      const [currentEvent, overview, stageGroups] = await Promise.all([
+        contentService.getEventById(eventId),
+        contentService.getEventOverview(eventId),
+        contentService.getGroupedMatchesByEvent(eventId),
+      ]);
 
-    this.setData({
-      events,
-      activeEventId: eventId,
-      currentEvent,
-      overview,
-      stageGroups,
-      selectedMatch: null,
-      showMatchDetail: false,
-    });
+      this.setData({
+        events,
+        activeEventId: eventId,
+        currentEvent,
+        overview,
+        stageGroups,
+        selectedMatch: null,
+        showMatchDetail: false,
+      });
+    } finally {
+      this.setData({ isLoading: false });
+    }
   },
 
   async handleEventSwitch(event) {
