@@ -1,4 +1,5 @@
 const contentService = require('../../services/content-service');
+const adminService = require('../../services/admin-service');
 
 Page({
   data: {
@@ -58,5 +59,10 @@ Page({
     wx.navigateTo({
       url: `/pages/news-detail/news-detail?newsId=${newsId}`,
     });
+  },
+
+  openAdminEntry() {
+    const target = adminService.isLoggedIn() ? '/pages/admin-home/admin-home' : '/pages/admin-login/admin-login';
+    wx.navigateTo({ url: target });
   },
 });

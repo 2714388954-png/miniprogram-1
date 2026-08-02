@@ -1,0 +1,51 @@
+<app-nav-bar title="{{mode === 'submit' ? '问题反馈' : '反馈查阅'}}" back="{{false}}" color="#15314b" background="transparent"></app-nav-bar>
+<scroll-view class="page-scroll" scroll-y>
+  <view class="page-shell page-shell--safe admin-page">
+    <view class="page-top-actions">
+      <view class="page-back-btn" bindtap="handleBack">返回</view>
+    </view>
+    <block wx:if="{{mode === 'submit'}}">
+      <view class="panel feedback-card">
+        <text class="section-title">提交反馈</text>
+        <text class="section-subtitle">欢迎反馈页面异常、数据错误或使用建议。</text>
+
+        <view class="form-field">
+          <text class="form-label">称呼</text>
+          <input class="form-input" placeholder="可选" value="{{nickname}}" data-field="nickname" bindinput="handleInput" />
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">联系方式</text>
+          <input class="form-input" placeholder="可选，方便后续联系" value="{{contact}}" data-field="contact" bindinput="handleInput" />
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">反馈内容</text>
+          <textarea class="form-textarea" placeholder="请尽量写清楚问题现象或建议内容" value="{{content}}" data-field="content" bindinput="handleInput"></textarea>
+        </view>
+
+        <view class="primary-btn" bindtap="submitFeedback">{{isSubmitting ? '提交中...' : '提交反馈'}}</view>
+      </view>
+    </block>
+
+    <block wx:else>
+      <view wx:if="{{isLoading}}" class="loading-panel panel">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">加载反馈中...</text>
+      </view>
+
+      <view wx:if="{{!isLoading && feedbackList.length}}" class="feedback-list">
+        <block wx:for="{{feedbackList}}" wx:key="createTime">
+          <view class="panel feedback-item">
+            <text class="feedback-item__time">{{item.createTime}}</text>
+            <text class="feedback-item__name">{{item.nickname || '匿名同学'}}</text>
+            <text wx:if="{{item.contact}}" class="feedback-item__contact">联系方式：{{item.contact}}</text>
+            <text class="feedback-item__content">{{item.content}}</text>
+          </view>
+        </block>
+      </view>
+
+      <view wx:if="{{!isLoading && !feedbackList.length}}" class="empty-state panel">暂时还没有收到反馈。</view>
+    </block>
+  </view>
+</scroll-view>

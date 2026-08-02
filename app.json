@@ -4,7 +4,14 @@
     "pages/news-detail/news-detail",
     "pages/schedule/schedule",
     "pages/standings/standings",
-    "pages/stats/stats"
+    "pages/stats/stats",
+    "pages/admin-login/admin-login",
+    "pages/admin-home/admin-home",
+    "pages/admin-feedback/admin-feedback",
+    "pages/admin-matches/admin-matches",
+    "pages/admin-news/admin-news",
+    "pages/admin-standings/admin-standings",
+    "pages/admin-stats/admin-stats"
   ],
   "window": {
     "navigationBarTextStyle": "black",

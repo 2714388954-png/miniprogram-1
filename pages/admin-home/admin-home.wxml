@@ -1,0 +1,25 @@
+<app-nav-bar title="管理员首页" back="{{false}}" color="#15314b" background="transparent"></app-nav-bar>
+<scroll-view class="page-scroll" scroll-y>
+  <view class="page-shell page-shell--safe admin-page">
+    <view class="page-top-actions">
+      <view class="page-back-btn" bindtap="handleBack">返回</view>
+    </view>
+    <view class="panel summary-card">
+      <text class="summary-title">当前登录</text>
+      <text class="summary-name">{{session.displayName}}</text>
+      <text class="summary-meta">账号：{{session.username}}</text>
+      <text class="summary-meta">登录状态有效期为 24 小时，使用完毕后请主动退出。</text>
+    </view>
+
+    <view class="module-list">
+      <block wx:for="{{moduleCards}}" wx:key="key">
+        <view class="panel module-card" bindtap="openModule" data-url="{{item.url}}">
+          <text class="module-card__title">{{item.title}}</text>
+          <text class="module-card__desc">{{item.desc}}</text>
+        </view>
+      </block>
+    </view>
+
+    <view class="logout-btn" bindtap="handleLogout">退出登录</view>
+  </view>
+</scroll-view>

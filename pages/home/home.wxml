@@ -1,7 +1,10 @@
-<navigation-bar title="重大足协赛事" back="{{false}}" color="#15314b" background="transparent"></navigation-bar>
+<app-nav-bar title="重大足协赛事" back="{{false}}" color="#15314b" background="transparent"></app-nav-bar>
 <scroll-view class="page-scroll" scroll-y>
   <view class="app-page">
     <view class="page-shell">
+      <view class="page-top-actions">
+        <view class="admin-entry" bindtap="openAdminEntry">管理员入口</view>
+      </view>
       <scroll-view class="event-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
         <block wx:for="{{events}}" wx:key="eventId">
           <view

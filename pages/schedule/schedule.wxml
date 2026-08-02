@@ -1,4 +1,4 @@
-<navigation-bar title="赛程赛果" back="{{false}}" color="#15314b" background="transparent"></navigation-bar>
+<app-nav-bar title="赛程赛果" back="{{false}}" color="#15314b" background="transparent"></app-nav-bar>
 <scroll-view class="page-scroll" scroll-y>
   <view class="app-page">
     <view class="page-shell">
@@ -33,8 +33,8 @@
             <text class="section-title">{{item.stageName}}</text>
           </view>
           <view class="match-list">
-            <block wx:for="{{item.matches}}" wx:key="matchId">
-              <view class="match-card panel" bindtap="handleMatchOpen" data-match-id="{{item.matchId}}">
+            <block wx:for="{{item.matches}}" wx:key="recordKey">
+              <view class="match-card panel" bindtap="handleMatchOpen" data-match-id="{{item.matchId}}" data-record-id="{{item._id}}">
                 <view class="match-card__teams">
                   <text class="match-card__team">{{item.homeTeam}}</text>
                   <text class="match-card__score {{item.status === 'finished' ? 'match-card__score--done' : ''}}">

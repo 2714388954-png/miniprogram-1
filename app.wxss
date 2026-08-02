@@ -48,6 +48,33 @@ image {
   overflow-x: hidden;
 }
 
+.page-shell--safe {
+  padding-top: 84rpx;
+}
+
+.page-top-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.page-back-btn {
+  height: 64rpx;
+  padding: 0 22rpx;
+  border-radius: 999rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1rpx solid rgba(13, 95, 212, 0.12);
+  color: var(--theme-primary-deep);
+  font-size: 24rpx;
+  font-weight: 600;
+  flex: none;
+}
+
 .section-title {
   font-size: 36rpx;
   font-weight: 700;

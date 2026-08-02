@@ -56,8 +56,8 @@ Page({
   },
 
   handleMatchOpen(event) {
-    const { matchId } = event.currentTarget.dataset;
-    const match = this.findMatchById(matchId);
+    const { matchId, recordId } = event.currentTarget.dataset;
+    const match = this.findMatch(recordId, matchId);
     if (!match) {
       return;
     }
@@ -87,10 +87,15 @@ Page({
 
   stopOverlayScroll() {},
 
-  findMatchById(matchId) {
+  findMatch(recordId, matchId) {
     const { stageGroups } = this.data;
     for (let i = 0; i < stageGroups.length; i += 1) {
-      const target = stageGroups[i].matches.find((item) => item.matchId === matchId);
+      const target = stageGroups[i].matches.find((item) => {
+        if (recordId && item._id) {
+          return item._id === recordId;
+        }
+        return item.matchId === matchId;
+      });
       if (target) {
         return target;
       }

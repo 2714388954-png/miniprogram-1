@@ -1,0 +1,12 @@
+<app-nav-bar title="数据榜管理" back="{{false}}" color="#15314b" background="transparent"></app-nav-bar>
+<scroll-view class="page-scroll" scroll-y>
+  <view class="page-shell page-shell--safe admin-shell">
+    <view class="page-top-actions">
+      <view class="page-back-btn" bindtap="handleBack">返回</view>
+    </view>
+    <view class="panel placeholder-card">
+      <text class="section-title">数据榜管理开发中</text>
+      <text class="section-subtitle">下一步会在这里接入进球榜、助攻榜、黄牌榜和红牌榜的维护功能。</text>
+    </view>
+  </view>
+</scroll-view>

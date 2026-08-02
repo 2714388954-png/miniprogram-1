@@ -1,0 +1,40 @@
+<app-nav-bar title="管理员登录" back="{{false}}" color="#15314b" background="transparent"></app-nav-bar>
+<scroll-view class="page-scroll" scroll-y>
+  <view class="page-shell page-shell--safe admin-page">
+    <view class="page-top-actions">
+      <view class="page-back-btn" bindtap="handleBack">返回</view>
+    </view>
+    <view class="panel admin-card">
+      <view class="admin-card__head">
+        <text class="section-title">内部管理平台</text>
+        <text class="section-subtitle">登录后可进入赛事内容维护页面。</text>
+      </view>
+
+      <view class="form-field">
+        <text class="form-label">账号</text>
+        <input class="form-input" placeholder="请输入管理员账号" value="{{username}}" data-field="username" bindinput="handleInput" />
+      </view>
+
+      <view class="form-field">
+        <text class="form-label">密码</text>
+        <input class="form-input" password placeholder="请输入管理员密码" value="{{password}}" data-field="password" bindinput="handleInput" />
+      </view>
+
+      <view class="primary-btn" bindtap="handleLogin">
+        {{isSubmitting ? '登录中...' : '登录管理员页'}}
+      </view>
+    </view>
+
+    <view class="panel admin-card notice-card">
+      <text class="section-title">注意事项</text>
+      <text class="notice-text">本页面为重庆大学学生足球协会内部工作平台，非社团工作人员请勿登录或停留。</text>
+      <text class="notice-text">管理员使用完毕后请及时退出登录，避免在共用设备上长期保留登录状态。</text>
+    </view>
+
+    <view class="panel admin-card feedback-card">
+      <text class="section-title">问题反馈</text>
+      <text class="section-subtitle">同学如发现数据错误、页面异常或内容建议，可在这里提交反馈。</text>
+      <view class="secondary-btn" bindtap="openFeedback">提交反馈</view>
+    </view>
+  </view>
+</scroll-view>

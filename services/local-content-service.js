@@ -15,9 +15,11 @@ function normalizeMatch(match) {
 
   return {
     ...match,
+    recordKey: match._id || match.matchId,
     groupName: normalizeMaybeEmpty(match.groupName),
     reportNewsId: normalizeMaybeEmpty(match.reportNewsId),
     reportTitle: normalizeMaybeEmpty(match.reportTitle),
+    report: normalizeMaybeEmpty(match.report),
   };
 }
 

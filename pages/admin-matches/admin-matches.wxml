@@ -1,0 +1,161 @@
+<app-nav-bar title="比赛管理" back="{{false}}" color="#15314b" background="transparent"></app-nav-bar>
+<scroll-view class="page-scroll" scroll-y>
+  <view class="page-shell page-shell--safe admin-shell">
+    <view class="page-top-actions">
+      <view class="page-back-btn" bindtap="handleBack">返回</view>
+    </view>
+
+    <view class="panel matches-toolbar">
+      <text class="toolbar-label">当前赛事</text>
+      <scroll-view class="admin-event-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
+        <block wx:for="{{events}}" wx:key="eventId">
+          <view
+            class="admin-event-tab {{activeEventId === item.eventId ? 'admin-event-tab--active' : ''}}"
+            bindtap="handleEventSwitch"
+            data-event-id="{{item.eventId}}"
+          >
+            {{item.eventName}}
+          </view>
+        </block>
+      </scroll-view>
+      <view class="toolbar-action" bindtap="openCreateForm">新增比赛</view>
+    </view>
+
+    <view wx:if="{{isLoading}}" class="loading-panel panel">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载比赛中...</text>
+    </view>
+
+    <view wx:if="{{!isLoading && stageGroups.length}}" class="stage-list">
+      <block wx:for="{{stageGroups}}" wx:key="stageName">
+        <view class="panel stage-card">
+          <text class="stage-title">{{item.stageName}}</text>
+          <view class="match-admin-list">
+            <block wx:for="{{item.matches}}" wx:key="recordKey">
+              <view class="match-admin-item">
+                <view class="match-admin-item__head">
+                  <text class="match-admin-item__teams">{{item.homeTeam}} vs {{item.awayTeam}}</text>
+                  <view class="match-admin-item__edit" bindtap="openEditForm" data-match-id="{{item.matchId}}" data-record-id="{{item._id}}">编辑</view>
+                </view>
+                <text class="match-admin-item__meta">编号：{{item.matchId}}</text>
+                <text class="match-admin-item__meta">时间：{{item.matchTime}}</text>
+                <text class="match-admin-item__meta">地点：{{item.location}}</text>
+                <text class="match-admin-item__meta">状态：{{item.status}}</text>
+              </view>
+            </block>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <view wx:if="{{!isLoading && !stageGroups.length}}" class="empty-state panel">当前赛事还没有比赛数据。</view>
+  </view>
+</scroll-view>
+
+<view wx:if="{{showEditor}}" class="editor-mask" bindtap="closeEditor">
+  <view class="editor-sheet" catchtap="noop">
+    <view class="editor-form-shell">
+      <view class="editor-sheet__handle"></view>
+      <scroll-view class="editor-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="editor-head">
+          <text class="section-title">{{editorTitle}}</text>
+          <text class="section-subtitle">保存后会直接更新到当前赛事赛程中。</text>
+        </view>
+
+        <view class="form-grid">
+          <view class="form-field">
+            <text class="form-label">比赛编号</text>
+            <input class="form-input" value="{{formData.matchId}}" data-field="matchId" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="例如 match-005" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">比赛轮次 / 阶段</text>
+            <input class="form-input" value="{{formData.stage}}" data-field="stage" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="例如 第3轮 / 半决赛" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">小组名称</text>
+            <input class="form-input" value="{{formData.groupName}}" data-field="groupName" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="杯赛可填写 A组 / B组" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">比赛状态</text>
+            <picker mode="selector" range="{{statusOptions}}" range-key="label" value="{{statusIndex}}" bindchange="handleStatusChange">
+              <view class="form-input form-input--picker">{{statusOptions[statusIndex].label}}</view>
+            </picker>
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">主队</text>
+            <input class="form-input" value="{{formData.homeTeam}}" data-field="homeTeam" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="请输入主队名称" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">客队</text>
+            <input class="form-input" value="{{formData.awayTeam}}" data-field="awayTeam" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="请输入客队名称" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">主队比分</text>
+            <input class="form-input" type="number" value="{{formData.homeScore}}" data-field="homeScore" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="未开始可留空" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">客队比分</text>
+            <input class="form-input" type="number" value="{{formData.awayScore}}" data-field="awayScore" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="未开始可留空" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">比赛时间</text>
+            <input class="form-input" value="{{formData.matchTime}}" data-field="matchTime" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="例如 2026-08-01 16:00" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">比赛地点</text>
+            <input class="form-input" value="{{formData.location}}" data-field="location" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="请输入比赛地点" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">关联新闻编号</text>
+            <input class="form-input" value="{{formData.reportNewsId}}" data-field="reportNewsId" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="可选，例 news-005" />
+          </view>
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">关联新闻标题</text>
+          <input class="form-input" value="{{formData.reportTitle}}" data-field="reportTitle" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="可选，填写完整战报标题" />
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">进球球员</text>
+          <text class="field-tip">每行一条，格式：球员 | 球队 | 分钟</text>
+          <textarea
+            class="form-textarea form-textarea--compact"
+            value="{{formData.scorersText}}"
+            data-field="scorersText"
+            bindinput="handleFieldInput"
+            bindblur="handleFieldInput"
+            placeholder="例如：张三 | 经管学院 | 28'"
+          ></textarea>
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">简短战报</text>
+          <textarea
+            class="form-textarea"
+            value="{{formData.report}}"
+            data-field="report"
+            bindinput="handleFieldInput"
+            bindblur="handleFieldInput"
+            placeholder="请输入比赛简短战报"
+          ></textarea>
+        </view>
+      </scroll-view>
+
+      <view class="editor-actions">
+        <view class="editor-btn editor-btn--ghost" bindtap="closeEditor">取消</view>
+        <view class="editor-btn editor-btn--primary" bindtap="handleSaveTap">{{isSaving ? '保存中...' : '保存比赛'}}</view>
+      </view>
+    </view>
+  </view>
+</view>

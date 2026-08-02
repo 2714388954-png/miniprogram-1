@@ -1,4 +1,4 @@
-<navigation-bar title="新闻详情" color="#15314b" background="transparent"></navigation-bar>
+<app-nav-bar title="新闻详情" color="#15314b" background="transparent"></app-nav-bar>
 <scroll-view class="page-scroll" scroll-y>
   <view class="page-shell detail-page">
     <view wx:if="{{isLoading}}" class="loading-panel panel">

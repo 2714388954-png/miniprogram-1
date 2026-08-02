@@ -1,4 +1,4 @@
-<navigation-bar title="积分榜" back="{{false}}" color="#15314b" background="transparent"></navigation-bar>
+<app-nav-bar title="积分榜" back="{{false}}" color="#15314b" background="transparent"></app-nav-bar>
 <scroll-view class="page-scroll" scroll-y>
   <view class="app-page">
     <view class="page-shell">

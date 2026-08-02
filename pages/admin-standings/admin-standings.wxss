@@ -1,0 +1,7 @@
+.admin-shell {
+  padding-bottom: 48rpx;
+}
+
+.placeholder-card {
+  padding: 30rpx;
+}
