@@ -68,15 +68,29 @@
             <input class="form-input" value="{{formData.matchId}}" data-field="matchId" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="例如 match-005" />
           </view>
 
-          <view class="form-field">
-            <text class="form-label">比赛轮次 / 阶段</text>
-            <input class="form-input" value="{{formData.stage}}" data-field="stage" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="例如 第3轮 / 半决赛" />
+        <view class="form-field">
+          <text class="form-label">比赛轮次 / 阶段</text>
+          <input class="form-input" value="{{formData.stage}}" data-field="stage" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="例如 第3轮 / 半决赛" />
+          <view wx:if="{{currentEvent && currentEvent.eventType === 'cup'}}" class="stage-preset-wrap">
+            <text class="field-tip">杯赛可直接点选阶段，进入淘汰赛后不再填写小组名称。</text>
+            <view class="stage-preset-list">
+              <block wx:for="{{cupStagePresets}}" wx:key="value">
+                <view
+                  class="stage-preset {{formData.stage === item.value ? 'stage-preset--active' : ''}}"
+                  bindtap="applyCupStagePreset"
+                  data-stage="{{item.value}}"
+                >
+                  {{item.label}}
+                </view>
+              </block>
+            </view>
           </view>
+        </view>
 
-          <view class="form-field">
-            <text class="form-label">小组名称</text>
-            <input class="form-input" value="{{formData.groupName}}" data-field="groupName" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="杯赛可填写 A组 / B组" />
-          </view>
+        <view class="form-field">
+          <text class="form-label">小组名称</text>
+          <input class="form-input" value="{{formData.groupName}}" data-field="groupName" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="{{currentEvent && currentEvent.eventType === 'cup' ? '小组赛填写 A组 / B组，淘汰赛可留空' : '可留空'}}" />
+        </view>
 
           <view class="form-field">
             <text class="form-label">比赛状态</text>

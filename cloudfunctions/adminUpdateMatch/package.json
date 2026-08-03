@@ -1,0 +1,9 @@
+{
+  "name": "admin-update-match",
+  "version": "1.0.0",
+  "description": "Update or create match records for admin pages.",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

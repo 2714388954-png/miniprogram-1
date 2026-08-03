@@ -4,9 +4,146 @@
     <view class="page-top-actions">
       <view class="page-back-btn" bindtap="handleBack">返回</view>
     </view>
-    <view class="panel placeholder-card">
-      <text class="section-title">新闻管理开发中</text>
-      <text class="section-subtitle">下一步会在这里接入新闻列表、新增新闻、置顶与排序设置功能。</text>
+
+    <view class="panel news-toolbar">
+      <text class="toolbar-label">当前赛事</text>
+      <scroll-view class="admin-event-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
+        <block wx:for="{{events}}" wx:key="eventId">
+          <view
+            class="admin-event-tab {{activeEventId === item.eventId ? 'admin-event-tab--active' : ''}}"
+            bindtap="handleEventSwitch"
+            data-event-id="{{item.eventId}}"
+          >
+            {{item.eventName}}
+          </view>
+        </block>
+      </scroll-view>
+      <view class="toolbar-action" bindtap="openCreateForm">新增新闻</view>
     </view>
+
+    <view wx:if="{{isLoading}}" class="loading-panel panel">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载新闻中...</text>
+    </view>
+
+    <view wx:if="{{!isLoading && newsList.length}}" class="news-admin-list">
+      <block wx:for="{{newsList}}" wx:key="recordKey">
+        <view class="panel news-admin-card">
+          <view class="news-admin-card__head">
+            <view class="news-admin-card__main">
+              <text class="news-admin-card__title">{{item.title}}</text>
+              <view class="news-admin-card__tags">
+                <text class="news-admin-card__tag">{{item.category}}</text>
+                <text wx:if="{{item.isPinned}}" class="news-admin-card__badge">置顶</text>
+                <text wx:if="{{item.isFeatured}}" class="news-admin-card__badge news-admin-card__badge--strong">焦点</text>
+              </view>
+            </view>
+            <view class="news-admin-card__edit" bindtap="openEditForm" data-record-id="{{item._id}}" data-news-id="{{item.newsId}}">编辑</view>
+          </view>
+          <text class="news-admin-card__summary">{{item.summary}}</text>
+          <text class="news-admin-card__meta">编号：{{item.newsId}}</text>
+          <text class="news-admin-card__meta">发布时间：{{item.publishTime}}</text>
+          <text class="news-admin-card__meta">排序值：{{item.sortOrder}}</text>
+        </view>
+      </block>
+    </view>
+
+    <view wx:if="{{!isLoading && !newsList.length}}" class="empty-state panel">当前赛事还没有新闻数据。</view>
   </view>
 </scroll-view>
+
+<view wx:if="{{showEditor}}" class="editor-mask" bindtap="closeEditor">
+  <view class="editor-sheet" catchtap="noop">
+    <view class="editor-form-shell">
+      <view class="editor-sheet__handle"></view>
+      <scroll-view class="editor-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="editor-head">
+          <text class="section-title">{{editorTitle}}</text>
+          <text class="section-subtitle">保存后会同步更新首页新闻列表与新闻详情页。</text>
+        </view>
+
+        <view class="form-grid">
+          <view class="form-field">
+            <text class="form-label">新闻编号</text>
+            <input class="form-input" value="{{formData.newsId}}" data-field="newsId" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="例如 news-005" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">新闻分类</text>
+            <input class="form-input" value="{{formData.category}}" data-field="category" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="例如 赛事战报" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">发布时间</text>
+            <input class="form-input" value="{{formData.publishTime}}" data-field="publishTime" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="例如 2026-08-02 18:00" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">排序值</text>
+            <input class="form-input" type="number" value="{{formData.sortOrder}}" data-field="sortOrder" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="数字越小越靠前" />
+          </view>
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">新闻标题</text>
+          <input class="form-input" value="{{formData.title}}" data-field="title" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="请输入新闻标题" />
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">新闻摘要</text>
+          <textarea
+            class="form-textarea form-textarea--compact"
+            value="{{formData.summary}}"
+            data-field="summary"
+            bindinput="handleFieldInput"
+            bindblur="handleFieldInput"
+            placeholder="请输入新闻摘要"
+          ></textarea>
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">封面图地址</text>
+          <input class="form-input" value="{{formData.coverImage}}" data-field="coverImage" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="例如 /assets/covers/news-match.svg" />
+          <view class="cover-actions">
+            <view class="cover-action cover-action--primary" bindtap="chooseCoverImage">{{isUploadingCover ? '上传中...' : '上传封面图'}}</view>
+            <view wx:if="{{formData.coverImage}}" class="cover-action" bindtap="previewCoverImage">预览封面</view>
+          </view>
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">关联比赛编号</text>
+          <input class="form-input" value="{{formData.relatedMatchId}}" data-field="relatedMatchId" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="可选，例如 match-003" />
+        </view>
+
+        <view class="switch-row">
+          <view class="switch-card">
+            <text class="switch-card__label">置顶新闻</text>
+            <switch checked="{{formData.isPinned}}" color="#0d5fd4" data-field="isPinned" bindchange="handleSwitchChange" />
+          </view>
+          <view class="switch-card">
+            <text class="switch-card__label">焦点推荐</text>
+            <switch checked="{{formData.isFeatured}}" color="#0d5fd4" data-field="isFeatured" bindchange="handleSwitchChange" />
+          </view>
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">正文内容</text>
+          <textarea
+            class="form-textarea form-textarea--large"
+            value="{{formData.content}}"
+            data-field="content"
+            bindinput="handleFieldInput"
+            bindblur="handleFieldInput"
+            placeholder="请输入新闻正文"
+          ></textarea>
+        </view>
+      </scroll-view>
+
+      <view class="editor-actions">
+        <view wx:if="{{formData.recordId}}" class="editor-btn editor-btn--danger" bindtap="handleDeleteNews">{{isDeleting ? '删除中...' : '删除新闻'}}</view>
+        <view class="editor-btn editor-btn--ghost" bindtap="closeEditor">取消</view>
+        <view class="editor-btn editor-btn--primary" bindtap="handleSaveTap">{{isSaving ? '保存中...' : '保存新闻'}}</view>
+      </view>
+    </view>
+  </view>
+</view>

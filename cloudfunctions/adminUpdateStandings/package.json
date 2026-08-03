@@ -1,0 +1,9 @@
+{
+  "name": "admin-update-standings",
+  "version": "1.0.0",
+  "description": "Update or create standings records for admin pages.",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

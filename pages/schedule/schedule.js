@@ -12,15 +12,29 @@ Page({
     isLoading: true,
   },
 
+  hasLoaded: false,
+
   async onLoad() {
     this.setData({ isLoading: true });
     try {
       const events = await contentService.getEvents();
       const activeEventId = await contentService.getDefaultEventId();
       await this.syncPage(events, activeEventId);
+      this.hasLoaded = true;
     } finally {
       this.setData({ isLoading: false });
     }
+  },
+
+  async onShow() {
+    if (!this.hasLoaded) {
+      return;
+    }
+
+    contentService.clearCache();
+    const events = await contentService.getEvents();
+    const activeEventId = this.data.activeEventId || await contentService.getDefaultEventId();
+    await this.syncPage(events, activeEventId);
   },
 
   async syncPage(events, eventId) {

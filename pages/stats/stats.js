@@ -20,6 +20,8 @@ Page({
     isLoading: true,
   },
 
+  hasLoaded: false,
+
   async onLoad() {
     this.setData({ isLoading: true });
     try {
@@ -27,9 +29,22 @@ Page({
       const activeEventId = await contentService.getDefaultEventId();
       this.setData({ events, activeEventId });
       await this.syncStats(activeEventId, 'scorers');
+      this.hasLoaded = true;
     } finally {
       this.setData({ isLoading: false });
     }
+  },
+
+  async onShow() {
+    if (!this.hasLoaded) {
+      return;
+    }
+
+    contentService.clearCache();
+    const events = await contentService.getEvents();
+    const activeEventId = this.data.activeEventId || await contentService.getDefaultEventId();
+    this.setData({ events, activeEventId });
+    await this.syncStats(activeEventId, this.data.activeStatKey || 'scorers');
   },
 
   async syncStats(eventId, statKey) {

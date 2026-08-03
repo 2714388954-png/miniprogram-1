@@ -1,5 +1,7 @@
 const localContentService = require('./local-content-service');
 
+const knockoutStageKeywords = ['16进8', '8进4', '半决赛', '三四名决赛', '决赛'];
+
 function normalizeMaybeEmpty(value) {
   return value === 'none' ? '' : value;
 }
@@ -16,6 +18,7 @@ function normalizeMatch(match) {
     reportNewsId: normalizeMaybeEmpty(match.reportNewsId),
     reportTitle: normalizeMaybeEmpty(match.reportTitle),
     report: normalizeMaybeEmpty(match.report),
+    updatedAt: normalizeMaybeEmpty(match.updatedAt),
   };
 }
 
@@ -26,8 +29,24 @@ function normalizeNewsItem(item) {
 
   return {
     ...item,
+    recordKey: item._id || item.newsId,
     relatedMatchId: normalizeMaybeEmpty(item.relatedMatchId),
+    updatedAt: normalizeMaybeEmpty(item.updatedAt),
   };
+}
+
+function getStageSortValue(stageName = '') {
+  const knockoutIndex = knockoutStageKeywords.findIndex((keyword) => stageName.indexOf(keyword) !== -1);
+  if (knockoutIndex !== -1) {
+    return 100 + knockoutIndex;
+  }
+
+  const roundMatch = stageName.match(/第(\d+)轮/);
+  if (roundMatch) {
+    return Number(roundMatch[1]);
+  }
+
+  return 999;
 }
 
 function getDatabase() {
@@ -124,10 +143,12 @@ async function getGroupedMatchesByEvent(eventId) {
     grouped[match.stage].push(match);
   });
 
-  return Object.keys(grouped).map((stageName) => ({
-    stageName,
-    matches: grouped[stageName],
-  }));
+  return Object.keys(grouped)
+    .sort((a, b) => getStageSortValue(a) - getStageSortValue(b))
+    .map((stageName) => ({
+      stageName,
+      matches: grouped[stageName].slice().sort((a, b) => (a.matchTime > b.matchTime ? 1 : -1)),
+    }));
 }
 
 async function getStandingsByEvent(eventId) {
@@ -149,6 +170,7 @@ async function getStandingsByEvent(eventId) {
       groups: groupRows
         .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
         .map((item) => ({
+          recordKey: item._id || item.groupName || 'group',
           groupName: normalizeMaybeEmpty(item.groupName),
           table: item.table || [],
         })),
@@ -159,6 +181,7 @@ async function getStandingsByEvent(eventId) {
   return leagueRow
     ? {
         type: 'league',
+        recordKey: leagueRow._id || 'league',
         table: leagueRow.table || [],
       }
     : null;
@@ -200,15 +223,22 @@ async function getEventOverview(eventId) {
   const allMatches = eventMatches.flatMap((item) => item.matches);
   const finishedMatches = allMatches.filter((item) => item.status === 'finished').length;
   const pendingMatches = allMatches.filter((item) => item.status !== 'finished').length;
+  const ongoingMatches = allMatches.filter((item) => item.status === 'ongoing').length;
   const pinnedCount = eventNews.filter((item) => item.isPinned).length;
+  const inferredStatus =
+    ongoingMatches > 0
+      ? 'ongoing'
+      : finishedMatches > 0 && pendingMatches > 0
+        ? 'ongoing'
+        : allMatches.length > 0 && finishedMatches === allMatches.length
+          ? 'finished'
+          : eventInfo && eventInfo.status
+            ? eventInfo.status
+            : 'upcoming';
 
   return {
     statusLabel:
-      eventInfo && eventInfo.status === 'ongoing'
-        ? '进行中'
-        : eventInfo && eventInfo.status === 'finished'
-          ? '已结束'
-          : '未开始',
+      inferredStatus === 'ongoing' ? '进行中' : inferredStatus === 'finished' ? '已结束' : '未开始',
     eventTypeLabel:
       eventInfo && eventInfo.eventType === 'cup' ? '杯赛制' : eventInfo ? '联赛制' : '综合赛事',
     totalMatches: allMatches.length,

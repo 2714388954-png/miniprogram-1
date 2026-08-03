@@ -4,9 +4,158 @@
     <view class="page-top-actions">
       <view class="page-back-btn" bindtap="handleBack">返回</view>
     </view>
-    <view class="panel placeholder-card">
-      <text class="section-title">积分榜管理开发中</text>
-      <text class="section-subtitle">下一步会在这里接入联赛积分和杯赛小组积分的录入页面。</text>
+
+    <view class="panel standings-toolbar">
+      <text class="toolbar-label">当前赛事</text>
+      <scroll-view class="admin-event-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
+        <block wx:for="{{events}}" wx:key="eventId">
+          <view
+            class="admin-event-tab {{activeEventId === item.eventId ? 'admin-event-tab--active' : ''}}"
+            bindtap="handleEventSwitch"
+            data-event-id="{{item.eventId}}"
+          >
+            {{item.eventName}}
+          </view>
+        </block>
+      </scroll-view>
+
+      <view wx:if="{{currentEvent && currentEvent.eventType === 'cup'}}" class="display-mode-panel">
+        <view class="display-mode-panel__head">
+          <text class="display-mode-panel__title">前端优先展示</text>
+          <text class="display-mode-panel__desc">和新闻置顶类似，这里控制杯赛页面先显示哪一块内容。</text>
+        </view>
+        <view class="display-mode-options">
+          <block wx:for="{{cupDisplayModeOptions}}" wx:key="value">
+            <view
+              class="display-mode-option {{cupDisplayMode === item.value ? 'display-mode-option--active' : ''}}"
+              bindtap="handleCupDisplayModeTap"
+              data-mode="{{item.value}}"
+            >
+              <text class="display-mode-option__label">{{item.label}}</text>
+              <text class="display-mode-option__meta">{{item.value === 'group' ? '先显示小组积分' : '先显示淘汰赛阶段'}}</text>
+            </view>
+          </block>
+        </view>
+        <text wx:if="{{isSavingCupDisplayMode}}" class="display-mode-panel__saving">正在保存显示顺序...</text>
+      </view>
+
+      <view class="toolbar-actions">
+        <view class="toolbar-action" bindtap="openCreateLeagueForm">编辑总榜</view>
+        <view wx:if="{{currentEvent && currentEvent.eventType === 'cup'}}" class="toolbar-action toolbar-action--secondary" bindtap="openCreateGroupForm">新增小组</view>
+      </view>
     </view>
+
+    <view wx:if="{{isLoading}}" class="loading-panel panel">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载积分榜中...</text>
+    </view>
+
+    <view wx:if="{{!isLoading && standingsRecords.length}}" class="record-list">
+      <block wx:for="{{standingsRecords}}" wx:key="recordKey">
+        <view class="panel record-card">
+          <view class="record-card__head">
+            <view class="record-card__main">
+              <text class="record-card__title">{{item.tableType === 'group' ? item.groupName : '联赛总榜'}}</text>
+              <text class="record-card__meta">{{item.tableType === 'group' ? '杯赛小组积分榜' : '联赛积分榜'}}</text>
+            </view>
+            <view class="record-card__edit" bindtap="openEditForm" data-record-id="{{item._id}}">编辑</view>
+          </view>
+          <text class="record-card__preview">共 {{item.table.length}} 支队伍</text>
+          <block wx:for="{{item.table}}" wx:key="teamId">
+            <text wx:if="{{index < 3}}" class="record-card__team">{{item.rank}}. {{item.teamName}} - {{item.points}}分</text>
+          </block>
+        </view>
+      </block>
+    </view>
+
+    <view wx:if="{{!isLoading && currentEvent && currentEvent.eventType === 'cup' && knockoutStageGroups.length}}" class="panel knockout-admin-panel">
+      <view class="knockout-admin-panel__head">
+        <view class="knockout-admin-panel__main">
+          <text class="knockout-admin-panel__title">淘汰赛阶段数据</text>
+          <text class="knockout-admin-panel__desc">这一部分来自比赛管理，和前端积分榜页中的淘汰赛阶段保持一致。</text>
+        </view>
+        <view class="knockout-admin-panel__action" bindtap="openMatchManager">前往比赛管理</view>
+      </view>
+
+      <view class="knockout-admin-list">
+        <block wx:for="{{knockoutStageGroups}}" wx:key="stageName">
+          <view class="knockout-admin-stage">
+            <text class="knockout-admin-stage__title">{{item.stageName}}</text>
+            <block wx:for="{{item.matches}}" wx:key="recordKey">
+              <view class="knockout-admin-match">
+                <view class="knockout-admin-match__line">
+                  <text class="knockout-admin-match__team">{{item.homeTeam}}</text>
+                  <text class="knockout-admin-match__score">{{item.status === 'finished' ? item.homeScore + ' : ' + item.awayScore : 'VS'}}</text>
+                  <text class="knockout-admin-match__team knockout-admin-match__team--right">{{item.awayTeam}}</text>
+                </view>
+                <text class="knockout-admin-match__meta">{{item.matchTime}} · {{item.location}}</text>
+                <view
+                  class="knockout-admin-match__edit"
+                  bindtap="openKnockoutMatchEditor"
+                  data-event-id="{{activeEventId}}"
+                  data-match-id="{{item.matchId}}"
+                  data-record-id="{{item._id}}"
+                >
+                  编辑这场比赛
+                </view>
+              </view>
+            </block>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <view wx:if="{{!isLoading && !standingsRecords.length && !(currentEvent && currentEvent.eventType === 'cup' && knockoutStageGroups.length)}}" class="empty-state panel">当前赛事还没有积分榜数据。</view>
   </view>
 </scroll-view>
+
+<view wx:if="{{showEditor}}" class="editor-mask" bindtap="closeEditor">
+  <view class="editor-sheet" catchtap="noop">
+    <view class="editor-form-shell">
+      <view class="editor-sheet__handle"></view>
+      <scroll-view class="editor-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="editor-head">
+          <text class="section-title">{{editorTitle}}</text>
+          <text class="section-subtitle">每行一支球队，格式：队名 | 赛 | 胜 | 平 | 负 | 进 | 失 | 净胜 | 积分</text>
+        </view>
+
+        <view class="form-grid">
+          <view class="form-field">
+            <text class="form-label">榜单类型</text>
+            <picker mode="selector" range="{{tableTypeOptions}}" range-key="label" value="{{tableTypeIndex}}" bindchange="handleTableTypeChange">
+              <view class="form-input form-input--picker">{{tableTypeOptions[tableTypeIndex].label}}</view>
+            </picker>
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">排序值</text>
+            <input class="form-input" type="number" value="{{formData.sortOrder}}" data-field="sortOrder" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="小组榜顺序值" />
+          </view>
+        </view>
+
+        <view wx:if="{{formData.tableType === 'group'}}" class="form-field">
+          <text class="form-label">小组名称</text>
+          <input class="form-input" value="{{formData.groupName}}" data-field="groupName" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="例如 A组 / B组" />
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">积分榜内容</text>
+          <textarea
+            class="form-textarea form-textarea--large"
+            value="{{formData.tableText}}"
+            data-field="tableText"
+            bindinput="handleFieldInput"
+            bindblur="handleFieldInput"
+            placeholder="例如：计算机学院 | 3 | 2 | 1 | 0 | 8 | 3 | 5 | 7"
+          ></textarea>
+        </view>
+      </scroll-view>
+
+      <view class="editor-actions">
+        <view wx:if="{{formData.recordId}}" class="editor-btn editor-btn--danger" bindtap="handleDeleteRecord">{{isDeleting ? '删除中...' : '删除榜单'}}</view>
+        <view class="editor-btn editor-btn--ghost" bindtap="closeEditor">取消</view>
+        <view class="editor-btn editor-btn--primary" bindtap="handleSaveTap">{{isSaving ? '保存中...' : '保存积分榜'}}</view>
+      </view>
+    </view>
+  </view>
+</view>

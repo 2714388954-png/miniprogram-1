@@ -25,6 +25,9 @@
           <text class="ranking-summary__badge">{{overview.standingsModeLabel}}</text>
         </view>
         <text class="section-subtitle">{{overview.eventTypeLabel}}，榜单会根据赛事赛制自动切换展示方式。</text>
+        <view wx:if="{{currentEvent.eventType === 'cup'}}" class="cup-mode-tip">
+          当前优先展示：{{cupDisplayMode === 'knockout' ? '淘汰赛阶段' : '小组赛积分'}}
+        </view>
       </view>
 
       <block wx:if="{{!isLoading && standings && standings.type === 'league'}}">
@@ -60,41 +63,73 @@
         </view>
       </block>
 
-      <block wx:if="{{!isLoading && standings && standings.type === 'group'}}">
-        <block wx:for="{{standings.groups}}" wx:key="groupName">
-          <view class="ranking-panel panel group-panel">
+      <block wx:if="{{!isLoading && currentEvent && currentEvent.eventType === 'cup'}}">
+        <block wx:for="{{cupSections}}" wx:key="sectionType">
+          <view wx:if="{{item.sectionType === 'group' && item.groups.length}}" class="ranking-panel panel">
             <view class="ranking-head">
-              <text class="section-title">{{item.groupName}}</text>
+              <text class="section-title">{{item.title}}</text>
+              <text class="section-subtitle">{{item.subtitle}}</text>
             </view>
-            <view class="table">
-              <view class="table__row table__row--head">
-                <text class="table__cell table__cell--rank">排名</text>
-                <text class="table__cell table__cell--team">球队</text>
-                <text class="table__cell">赛</text>
-                <text class="table__cell">胜</text>
-                <text class="table__cell">平</text>
-                <text class="table__cell">负</text>
-                <text class="table__cell table__cell--wide">进/失</text>
-                <text class="table__cell">积分</text>
-              </view>
-              <block wx:for="{{item.table}}" wx:key="teamId">
-                <view class="table__row {{item.rank === 1 ? 'table__row--gold' : item.rank === 2 ? 'table__row--silver' : ''}}">
-                  <text class="table__cell table__cell--rank">{{item.rank}}</text>
-                  <text class="table__cell table__cell--team">{{item.teamName}}</text>
-                  <text class="table__cell">{{item.played}}</text>
-                  <text class="table__cell">{{item.win}}</text>
-                  <text class="table__cell">{{item.draw}}</text>
-                  <text class="table__cell">{{item.lose}}</text>
-                  <text class="table__cell table__cell--wide">{{item.goalsFor}}/{{item.goalsAgainst}}</text>
-                  <text class="table__cell table__cell--points">{{item.points}}</text>
+            <block wx:for="{{item.groups}}" wx:key="recordKey">
+              <view class="group-panel {{index > 0 ? 'group-panel--spaced' : ''}}">
+                <view class="group-panel__title">{{item.groupName}}</view>
+                <view class="table">
+                  <view class="table__row table__row--head">
+                    <text class="table__cell table__cell--rank">排名</text>
+                    <text class="table__cell table__cell--team">球队</text>
+                    <text class="table__cell">赛</text>
+                    <text class="table__cell">胜</text>
+                    <text class="table__cell">平</text>
+                    <text class="table__cell">负</text>
+                    <text class="table__cell table__cell--wide">进/失</text>
+                    <text class="table__cell">积分</text>
+                  </view>
+                  <block wx:for="{{item.table}}" wx:key="teamId">
+                    <view class="table__row {{item.rank === 1 ? 'table__row--gold' : item.rank === 2 ? 'table__row--silver' : ''}}">
+                      <text class="table__cell table__cell--rank">{{item.rank}}</text>
+                      <text class="table__cell table__cell--team">{{item.teamName}}</text>
+                      <text class="table__cell">{{item.played}}</text>
+                      <text class="table__cell">{{item.win}}</text>
+                      <text class="table__cell">{{item.draw}}</text>
+                      <text class="table__cell">{{item.lose}}</text>
+                      <text class="table__cell table__cell--wide">{{item.goalsFor}}/{{item.goalsAgainst}}</text>
+                      <text class="table__cell table__cell--points">{{item.points}}</text>
+                    </view>
+                  </block>
                 </view>
-              </block>
+              </view>
+            </block>
+          </view>
+
+          <view wx:if="{{item.sectionType === 'knockout' && item.stages.length}}" class="ranking-panel panel">
+            <view class="ranking-head">
+              <text class="section-title">{{item.title}}</text>
+              <text class="section-subtitle">{{item.subtitle}}</text>
             </view>
+            <block wx:for="{{item.stages}}" wx:key="stageName">
+              <view class="knockout-stage {{index > 0 ? 'knockout-stage--spaced' : ''}}">
+                <view class="knockout-stage__title">{{item.stageName}}</view>
+                <block wx:for="{{item.matches}}" wx:key="recordKey">
+                  <view class="knockout-match">
+                    <view class="knockout-match__head">
+                      <text wx:if="{{item.groupName}}" class="knockout-match__group">{{item.groupName}}</text>
+                      <text class="knockout-match__time">{{item.matchTime}}</text>
+                    </view>
+                    <view class="knockout-match__teams">
+                      <text class="knockout-match__team">{{item.homeTeam}}</text>
+                      <text class="knockout-match__score">{{item.status === 'finished' ? item.homeScore + ' : ' + item.awayScore : 'VS'}}</text>
+                      <text class="knockout-match__team knockout-match__team--right">{{item.awayTeam}}</text>
+                    </view>
+                    <view class="knockout-match__location">{{item.location}}</view>
+                  </view>
+                </block>
+              </view>
+            </block>
           </view>
         </block>
       </block>
 
-      <view wx:if="{{!isLoading && !standings}}" class="empty-state panel">当前赛事还没有积分榜数据。</view>
+      <view wx:if="{{!isLoading && !standings && (!currentEvent || currentEvent.eventType !== 'cup')}}" class="empty-state panel">当前赛事还没有积分榜数据。</view>
     </view>
     <bottom-tab-bar current="standings"></bottom-tab-bar>
   </view>

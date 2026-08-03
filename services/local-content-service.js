@@ -4,6 +4,8 @@ const { matches } = require('../data/matches');
 const { standings } = require('../data/standings');
 const { stats } = require('../data/stats');
 
+const knockoutStageKeywords = ['16进8', '8进4', '半决赛', '三四名决赛', '决赛'];
+
 function normalizeMaybeEmpty(value) {
   return value === 'none' ? '' : value;
 }
@@ -20,6 +22,7 @@ function normalizeMatch(match) {
     reportNewsId: normalizeMaybeEmpty(match.reportNewsId),
     reportTitle: normalizeMaybeEmpty(match.reportTitle),
     report: normalizeMaybeEmpty(match.report),
+    updatedAt: normalizeMaybeEmpty(match.updatedAt),
   };
 }
 
@@ -30,7 +33,9 @@ function normalizeNewsItem(item) {
 
   return {
     ...item,
+    recordKey: item._id || item.newsId,
     relatedMatchId: normalizeMaybeEmpty(item.relatedMatchId),
+    updatedAt: normalizeMaybeEmpty(item.updatedAt),
   };
 }
 
@@ -42,14 +47,29 @@ function normalizeStandingsPayload(payload) {
   if (payload.type === 'group') {
     return {
       ...payload,
-      groups: (payload.groups || []).map((group) => ({
+      groups: (payload.groups || []).map((group, index) => ({
         ...group,
+        recordKey: group.recordKey || group.groupName || `group-${index}`,
         groupName: normalizeMaybeEmpty(group.groupName),
       })),
     };
   }
 
   return payload;
+}
+
+function getStageSortValue(stageName = '') {
+  const knockoutIndex = knockoutStageKeywords.findIndex((keyword) => stageName.indexOf(keyword) !== -1);
+  if (knockoutIndex !== -1) {
+    return 100 + knockoutIndex;
+  }
+
+  const roundMatch = stageName.match(/第(\d+)轮/);
+  if (roundMatch) {
+    return Number(roundMatch[1]);
+  }
+
+  return 999;
 }
 
 function getEvents() {
@@ -124,10 +144,12 @@ function getGroupedMatchesByEvent(eventId) {
     grouped[match.stage].push(match);
   });
 
-  return Object.keys(grouped).map((stageName) => ({
-    stageName,
-    matches: grouped[stageName],
-  }));
+  return Object.keys(grouped)
+    .sort((a, b) => getStageSortValue(a) - getStageSortValue(b))
+    .map((stageName) => ({
+      stageName,
+      matches: grouped[stageName].slice().sort((a, b) => (a.matchTime > b.matchTime ? 1 : -1)),
+    }));
 }
 
 function getStandingsByEvent(eventId) {
@@ -152,12 +174,23 @@ function getEventOverview(eventId) {
 
   const finishedMatches = eventMatches.filter((item) => item.status === 'finished').length;
   const pendingMatches = eventMatches.filter((item) => item.status !== 'finished').length;
+  const ongoingMatches = eventMatches.filter((item) => item.status === 'ongoing').length;
   const pinnedCount = eventNews.filter((item) => item.isPinned).length;
   const standingsModeLabel =
     eventStandings && eventStandings.type === 'group' ? '小组积分榜' : '总积分榜';
+  const inferredStatus =
+    ongoingMatches > 0
+      ? 'ongoing'
+      : finishedMatches > 0 && pendingMatches > 0
+        ? 'ongoing'
+        : eventMatches.length > 0 && finishedMatches === eventMatches.length
+          ? 'finished'
+          : eventInfo && eventInfo.status
+            ? eventInfo.status
+            : 'upcoming';
 
   return {
-    statusLabel: eventInfo ? getStatusLabel(eventInfo.status) : '待定',
+    statusLabel: getStatusLabel(inferredStatus),
     eventTypeLabel: eventInfo ? getEventTypeLabel(eventInfo.eventType) : '综合赛事',
     totalMatches: eventMatches.length,
     finishedMatches,

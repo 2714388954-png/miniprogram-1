@@ -14,6 +14,7 @@ const events = [
     eventName: '2026新生杯',
     fullName: '2026重庆大学学生足球协会新生杯',
     eventType: 'cup',
+    cupDisplayMode: 'group',
     season: '2026',
     coverImage: '/assets/covers/cup-cover.svg',
     description: '新生杯采用小组赛加淘汰赛赛制。',

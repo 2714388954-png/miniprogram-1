@@ -2,9 +2,19 @@ const adminService = require('../../services/admin-service');
 const contentService = require('../../services/content-service');
 const matchAdminService = require('../../services/match-admin-service');
 
+const CUP_STAGE_PRESETS = [
+  { value: '小组赛', label: '小组赛', groupHint: true },
+  { value: '16进8', label: '16进8', groupHint: false },
+  { value: '8进4', label: '8进4', groupHint: false },
+  { value: '半决赛', label: '半决赛', groupHint: false },
+  { value: '三四名决赛', label: '三四名决赛', groupHint: false },
+  { value: '决赛', label: '决赛', groupHint: false },
+];
+
 function createEmptyForm(eventId) {
   return {
     recordId: '',
+    updatedAt: '',
     eventId: eventId || '',
     matchId: '',
     stage: '',
@@ -34,19 +44,23 @@ Page({
     events: [],
     eventIndex: 0,
     activeEventId: '',
+    currentEvent: null,
     stageGroups: [],
     isLoading: true,
     showEditor: false,
     isSaving: false,
     editorTitle: '新增比赛',
     statusOptions: matchAdminService.STATUS_OPTIONS,
+    cupStagePresets: CUP_STAGE_PRESETS,
     statusIndex: 0,
     formData: createEmptyForm(''),
   },
 
   draftFormData: createEmptyForm(''),
 
-  async onLoad() {
+  pendingOpenParams: null,
+
+  async onLoad(options) {
     const session = adminService.getSession();
     if (!session) {
       wx.redirectTo({
@@ -54,6 +68,13 @@ Page({
       });
       return;
     }
+
+    this.pendingOpenParams = {
+      eventId: options && options.eventId ? decodeURIComponent(options.eventId) : '',
+      matchId: options && options.matchId ? decodeURIComponent(options.matchId) : '',
+      recordId: options && options.recordId ? decodeURIComponent(options.recordId) : '',
+      openEditor: options && options.openEditor === '1',
+    };
 
     await this.loadPage();
   },
@@ -70,7 +91,8 @@ Page({
     this.setData({ isLoading: true });
     try {
       const events = await contentService.getEvents();
-      const activeEventId = events[0] ? events[0].eventId : '';
+      const preferredEventId = this.pendingOpenParams && this.pendingOpenParams.eventId;
+      const activeEventId = preferredEventId || (events[0] ? events[0].eventId : '');
       await this.loadMatchesForEvent(events, activeEventId);
     } finally {
       this.setData({ isLoading: false });
@@ -78,7 +100,10 @@ Page({
   },
 
   async loadMatchesForEvent(events, eventId) {
-    const stageGroups = eventId ? await matchAdminService.getMatchesByEvent(eventId) : [];
+    const [stageGroups, currentEvent] = await Promise.all([
+      eventId ? matchAdminService.getMatchesByEvent(eventId) : [],
+      eventId ? contentService.getEventById(eventId) : null,
+    ]);
     const eventIndex = Math.max(
       0,
       events.findIndex((item) => item.eventId === eventId)
@@ -89,12 +114,15 @@ Page({
       events,
       eventIndex,
       activeEventId: eventId,
+      currentEvent,
       stageGroups,
       showEditor: false,
       formData: nextFormData,
       statusIndex: 0,
     });
     this.draftFormData = { ...nextFormData };
+
+    this.tryOpenPendingMatchEditor();
   },
 
   async handleEventChange(event) {
@@ -153,6 +181,7 @@ Page({
 
     const nextFormData = {
       recordId: matchItem._id || '',
+      updatedAt: matchItem.updatedAt || '',
       eventId: matchItem.eventId,
       matchId: matchItem.matchId,
       stage: matchItem.stage,
@@ -206,6 +235,31 @@ Page({
 
     this.setData({
       [`formData.${field}`]: nextValue,
+    });
+  },
+
+  applyCupStagePreset(event) {
+    const { stage } = event.currentTarget.dataset;
+    if (!stage) {
+      return;
+    }
+
+    const nextPatch = {
+      stage,
+    };
+
+    if (stage !== '小组赛') {
+      nextPatch.groupName = '';
+    }
+
+    this.draftFormData = {
+      ...(this.draftFormData || {}),
+      ...nextPatch,
+    };
+
+    this.setData({
+      'formData.stage': nextPatch.stage,
+      ...(stage !== '小组赛' ? { 'formData.groupName': '' } : {}),
     });
   },
 
@@ -327,6 +381,32 @@ Page({
       }
     }
     return null;
+  },
+
+  tryOpenPendingMatchEditor() {
+    const pending = this.pendingOpenParams;
+    if (!pending || !pending.openEditor) {
+      return;
+    }
+
+    if (pending.eventId && pending.eventId !== this.data.activeEventId) {
+      return;
+    }
+
+    const targetMatch = this.findMatch(pending.recordId, pending.matchId);
+    if (!targetMatch) {
+      return;
+    }
+
+    this.pendingOpenParams = null;
+    this.openEditForm({
+      currentTarget: {
+        dataset: {
+          matchId: targetMatch.matchId,
+          recordId: targetMatch._id || '',
+        },
+      },
+    });
   },
 
   handleBack() {

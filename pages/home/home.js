@@ -12,7 +12,36 @@ Page({
     isLoading: true,
   },
 
+  hasLoaded: false,
+
   async onLoad() {
+    await this.reloadPageData();
+    this.hasLoaded = true;
+  },
+
+  async onShow() {
+    if (!this.hasLoaded) {
+      return;
+    }
+
+    contentService.clearCache();
+    await this.reloadCurrentEvent();
+  },
+
+  async onPullDownRefresh() {
+    try {
+      contentService.clearCache();
+      await this.reloadPageData();
+      wx.showToast({
+        title: '内容已刷新',
+        icon: 'success',
+      });
+    } finally {
+      wx.stopPullDownRefresh();
+    }
+  },
+
+  async reloadPageData() {
     this.setData({ isLoading: true });
     try {
       const events = await contentService.getEvents();
@@ -22,6 +51,16 @@ Page({
     } finally {
       this.setData({ isLoading: false });
     }
+  },
+
+  async reloadCurrentEvent() {
+    const eventId = this.data.activeEventId || await contentService.getDefaultEventId();
+    const events = this.data.events && this.data.events.length
+      ? this.data.events
+      : await contentService.getEvents();
+
+    this.setData({ events });
+    await this.syncEventContent(eventId);
   },
 
   async syncEventContent(eventId) {

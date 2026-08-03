@@ -1,0 +1,9 @@
+{
+  "name": "admin-delete-standings",
+  "version": "1.0.0",
+  "description": "Delete standings records for admin pages.",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}
