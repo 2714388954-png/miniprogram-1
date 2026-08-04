@@ -1,12 +1,27 @@
 <view class="tabbar-shell">
-  <view class="tabbar panel">
-    <block wx:for="{{tabs}}" wx:key="key">
-      <view class="tabbar__item" bindtap="handleSwitch" data-key="{{item.key}}" data-path="{{item.path}}">
-        <view class="tabbar__sticker {{current === item.key ? 'tabbar__sticker--active' : ''}}">
-          <text class="tabbar__sticker-text">{{item.sticker}}</text>
+  <view class="tabbar">
+    <view class="tabbar__group tabbar__group--left">
+      <block wx:for="{{leftTabs}}" wx:key="key">
+        <view class="tabbar__item" bindtap="handleSwitch" data-key="{{item.key}}" data-path="{{item.path}}">
+          <view class="tabbar__sticker {{current === item.key ? 'tabbar__sticker--active' : ''}}">
+            <text class="tabbar__sticker-text">{{item.iconText}}</text>
+          </view>
         </view>
-        <text class="tabbar__label {{current === item.key ? 'tabbar__label--active' : ''}}">{{item.label}}</text>
-      </view>
-    </block>
+      </block>
+    </view>
+
+    <view class="tabbar__badge">
+      <image class="tabbar__badge-image" src="{{badgeSrc}}" mode="aspectFit"></image>
+    </view>
+
+    <view class="tabbar__group tabbar__group--right">
+      <block wx:for="{{rightTabs}}" wx:key="key">
+        <view class="tabbar__item" bindtap="handleSwitch" data-key="{{item.key}}" data-path="{{item.path}}">
+          <view class="tabbar__sticker {{current === item.key ? 'tabbar__sticker--active' : ''}}">
+            <text class="tabbar__sticker-text">{{item.iconText}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
   </view>
 </view>

@@ -1,83 +1,175 @@
-.stats-summary {
-  margin-top: 24rpx;
-  padding: 24rpx;
+.event-filter-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
 }
 
-.stats-summary__head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20rpx;
+.event-filter-card {
+  padding: 20rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  border: 1rpx solid rgba(13, 95, 212, 0.08);
+  box-shadow: 0 16rpx 36rpx rgba(17, 53, 87, 0.06);
 }
 
-.stats-summary__badge {
-  flex: none;
-  max-width: 240rpx;
-  padding: 10rpx 18rpx;
-  border-radius: 999rpx;
-  background: rgba(13, 95, 212, 0.1);
-  color: var(--theme-primary);
+.event-filter-card__label {
+  display: block;
   font-size: 22rpx;
+  color: var(--theme-text-secondary);
+}
+
+.event-filter-card__picker {
+  margin-top: 14rpx;
+  min-height: 84rpx;
+  padding: 0 20rpx;
+  border-radius: 20rpx;
+  background: #f8fbff;
+  border: 1rpx solid rgba(13, 95, 212, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.event-filter-card__picker--disabled {
+  background: #f4f6f8;
+  border-color: rgba(17, 53, 87, 0.08);
+}
+
+.event-filter-card__value {
+  flex: 1;
+  min-width: 0;
+  font-size: 26rpx;
   font-weight: 600;
+  color: var(--theme-text);
+}
+
+.event-filter-card__picker--disabled .event-filter-card__value {
+  color: var(--theme-text-secondary);
+}
+
+.event-filter-card__arrow {
+  flex: none;
+  font-size: 24rpx;
+  color: var(--theme-text-secondary);
 }
 
 .stats-panel {
+  --stats-team-width: 28%;
+  --stats-value-width: 20%;
   margin-top: 24rpx;
-  padding: 24rpx;
+  padding: 18rpx 20rpx;
 }
 
-.stats-head {
-  margin-bottom: 18rpx;
+.stats-table-head {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 4rpx 0 14rpx;
+  border-bottom: 1rpx solid #e6edf5;
+}
+
+.stats-table-head__name,
+.stats-table-head__team,
+.stats-table-head__value {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--theme-text-secondary);
+  white-space: nowrap;
+}
+
+.stats-table-head__name {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: left;
+}
+
+.stats-table-head__team {
+  width: var(--stats-team-width);
+  flex: 0 0 var(--stats-team-width);
+  text-align: left;
+}
+
+.stats-table-head__value {
+  width: var(--stats-value-width);
+  flex: 0 0 var(--stats-value-width);
+  text-align: right;
 }
 
 .stats-row {
   display: flex;
   align-items: center;
-  gap: 18rpx;
-  padding: 22rpx 0;
+  gap: 10rpx;
+  padding: 16rpx 0;
 }
 
 .stats-row + .stats-row {
   border-top: 1rpx solid #edf2f7;
 }
 
-.stats-row--top .stats-row__rank {
-  background: var(--theme-primary-soft);
-  color: var(--theme-primary);
+.stats-row--gold {
+  background: rgba(243, 192, 77, 0.12);
 }
 
-.stats-row__rank {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #eef3f9;
-  color: var(--theme-text-secondary);
-  font-weight: 700;
+.stats-row--silver {
+  background: rgba(213, 220, 235, 0.26);
 }
 
-.stats-row__main {
-  flex: 1;
+.stats-row--bronze {
+  background: rgba(215, 160, 125, 0.12);
+}
+
+.stats-row__name-col,
+.stats-row__team-col,
+.stats-row__value-col {
   min-width: 0;
+}
+
+.stats-row__name-col {
+  flex: 1 1 0;
+}
+
+.stats-row__team-col {
+  display: flex;
+  width: var(--stats-team-width);
+  flex: 0 0 var(--stats-team-width);
+  justify-content: flex-start;
+}
+
+.stats-row__value-col {
+  display: flex;
+  width: var(--stats-value-width);
+  flex: 0 0 var(--stats-value-width);
+  justify-content: flex-end;
 }
 
 .stats-row__name {
   display: block;
-  font-size: 30rpx;
+  font-size: 27rpx;
   font-weight: 700;
+  min-width: 0;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stats-row__team {
   display: block;
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: var(--theme-text-secondary);
+  font-size: 26rpx;
+  color: var(--theme-text);
+  min-width: 0;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stats-row__value {
-  font-size: 30rpx;
+  font-size: 27rpx;
   font-weight: 700;
   color: var(--theme-primary);
+  text-align: right;
+  white-space: nowrap;
 }

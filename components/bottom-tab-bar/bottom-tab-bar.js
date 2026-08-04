@@ -1,8 +1,8 @@
 const tabs = [
-  { key: 'home', label: '首页', sticker: '首', path: '/pages/home/home' },
-  { key: 'schedule', label: '赛程', sticker: '赛', path: '/pages/schedule/schedule' },
-  { key: 'standings', label: '积分榜', sticker: '榜', path: '/pages/standings/standings' },
-  { key: 'stats', label: '数据榜', sticker: '数', path: '/pages/stats/stats' },
+  { key: 'home', iconText: '首页', path: '/pages/home/home' },
+  { key: 'schedule', iconText: '赛程', path: '/pages/schedule/schedule' },
+  { key: 'standings', iconText: '积分', path: '/pages/standings/standings' },
+  { key: 'stats', iconText: '数据', path: '/pages/stats/stats' },
 ];
 
 Component({
@@ -13,7 +13,9 @@ Component({
     },
   },
   data: {
-    tabs,
+    leftTabs: tabs.slice(0, 2),
+    rightTabs: tabs.slice(2),
+    badgeSrc: '/assets/club-badge.png',
   },
   methods: {
     handleSwitch(event) {

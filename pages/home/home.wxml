@@ -4,6 +4,7 @@
     <view class="page-shell">
       <view class="page-top-actions">
         <view class="admin-entry" bindtap="openAdminEntry">管理员入口</view>
+        <image class="home-badge" src="/assets/club-badge.png" mode="aspectFit"></image>
       </view>
       <scroll-view class="event-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
         <block wx:for="{{events}}" wx:key="eventId">
@@ -30,21 +31,6 @@
             <text class="hero__status">{{overview.statusLabel}}</text>
           </view>
           <text class="hero__desc">{{currentEvent.description}}</text>
-        </view>
-
-        <view class="hero__overview">
-          <view class="hero__overview-card">
-            <text class="hero__overview-value">{{overview.eventTypeLabel}}</text>
-            <text class="hero__overview-label">赛事类型</text>
-          </view>
-          <view class="hero__overview-card">
-            <text class="hero__overview-value">{{overview.finishedMatches}} / {{overview.totalMatches}}</text>
-            <text class="hero__overview-label">已完成比赛</text>
-          </view>
-          <view class="hero__overview-card">
-            <text class="hero__overview-value">{{overview.pinnedCount}}</text>
-            <text class="hero__overview-label">置顶新闻</text>
-          </view>
         </view>
 
         <block wx:if="{{featuredNews.length}}">

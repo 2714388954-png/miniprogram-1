@@ -2,32 +2,45 @@
 <scroll-view class="page-scroll" scroll-y>
   <view class="app-page">
     <view class="page-shell">
-      <scroll-view class="event-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
-        <block wx:for="{{events}}" wx:key="eventId">
-          <view
-            class="event-tab {{activeEventId === item.eventId ? 'event-tab--active' : ''}}"
-            bindtap="handleEventSwitch"
-            data-event-id="{{item.eventId}}"
+      <view class="event-filter-row">
+        <view class="event-filter-card">
+          <text class="event-filter-card__label">当前赛事</text>
+          <picker
+            mode="selector"
+            range="{{currentEvents}}"
+            range-key="eventName"
+            value="{{currentEventIndex}}"
+            bindchange="handleCurrentEventChange"
+            disabled="{{!currentEvents.length}}"
           >
-            {{item.eventName}}
-          </view>
-        </block>
-      </scroll-view>
+            <view class="event-filter-card__picker {{!currentEvents.length ? 'event-filter-card__picker--disabled' : ''}}">
+              <text class="event-filter-card__value">{{currentEvents.length ? currentEvents[currentEventIndex].eventName : '暂无赛事'}}</text>
+              <text class="event-filter-card__arrow">▾</text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="event-filter-card">
+          <text class="event-filter-card__label">历史赛事</text>
+          <picker
+            mode="selector"
+            range="{{historyEvents}}"
+            range-key="eventName"
+            value="{{historyEventIndex}}"
+            bindchange="handleHistoryEventChange"
+            disabled="{{!historyEvents.length}}"
+          >
+            <view class="event-filter-card__picker {{!historyEvents.length ? 'event-filter-card__picker--disabled' : ''}}">
+              <text class="event-filter-card__value">{{historyEvents.length ? historyEvents[historyEventIndex].eventName : '暂无历史赛事'}}</text>
+              <text class="event-filter-card__arrow">▾</text>
+            </view>
+          </picker>
+        </view>
+      </view>
 
       <view wx:if="{{isLoading}}" class="loading-panel panel">
         <view class="loading-spinner"></view>
         <text class="loading-text">加载积分中...</text>
-      </view>
-
-      <view wx:if="{{!isLoading && currentEvent}}" class="ranking-summary panel">
-        <view class="ranking-summary__head">
-          <text class="section-title">{{currentEvent.eventName}}</text>
-          <text class="ranking-summary__badge">{{overview.standingsModeLabel}}</text>
-        </view>
-        <text class="section-subtitle">{{overview.eventTypeLabel}}，榜单会根据赛事赛制自动切换展示方式。</text>
-        <view wx:if="{{currentEvent.eventType === 'cup'}}" class="cup-mode-tip">
-          当前优先展示：{{cupDisplayMode === 'knockout' ? '淘汰赛阶段' : '小组赛积分'}}
-        </view>
       </view>
 
       <block wx:if="{{!isLoading && standings && standings.type === 'league'}}">

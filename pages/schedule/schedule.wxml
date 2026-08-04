@@ -1,7 +1,7 @@
 <app-nav-bar title="赛程赛果" back="{{false}}" color="#15314b" background="transparent"></app-nav-bar>
 <scroll-view class="page-scroll" scroll-y>
   <view class="app-page">
-    <view class="page-shell">
+    <view class="page-shell schedule-shell">
       <scroll-view class="event-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
         <block wx:for="{{events}}" wx:key="eventId">
           <view
@@ -17,14 +17,6 @@
       <view wx:if="{{isLoading}}" class="loading-panel panel">
         <view class="loading-spinner"></view>
         <text class="loading-text">加载赛程中...</text>
-      </view>
-
-      <view wx:if="{{!isLoading && currentEvent}}" class="page-intro panel">
-        <view class="page-intro__head">
-          <text class="section-title">{{currentEvent.eventName}}</text>
-          <text class="page-intro__badge">{{overview.statusLabel}}</text>
-        </view>
-        <text class="section-subtitle">按比赛轮次或阶段展示赛程与赛果，点击比赛卡片可查看详细信息。</text>
       </view>
 
       <block wx:if="{{!isLoading}}" wx:for="{{stageGroups}}" wx:key="stageName">

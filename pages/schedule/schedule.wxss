@@ -1,51 +1,35 @@
-.page-intro {
-  padding: 24rpx;
-  margin-bottom: 28rpx;
-}
-
-.page-intro__head {
-  display: flex;
-  justify-content: space-between;
-  gap: 20rpx;
-  align-items: center;
-}
-
-.page-intro__badge {
-  flex: none;
-  padding: 10rpx 18rpx;
-  border-radius: 999rpx;
-  background: rgba(13, 95, 212, 0.1);
-  color: var(--theme-primary);
-  font-size: 22rpx;
-  font-weight: 600;
+.schedule-shell {
+  padding-left: 18rpx;
+  padding-right: 18rpx;
 }
 
 .stage-section + .stage-section {
-  margin-top: 28rpx;
+  margin-top: 18rpx;
 }
 
 .match-list {
   display: flex;
   flex-direction: column;
-  gap: 18rpx;
-  margin-top: 18rpx;
+  gap: 10rpx;
+  margin-top: 12rpx;
 }
 
 .match-card {
-  padding: 24rpx;
+  padding: 12rpx 14rpx;
+  border-radius: 22rpx;
 }
 
 .match-card__teams {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18rpx;
-  min-height: 84rpx;
+  gap: 12rpx;
+  min-height: 60rpx;
 }
 
 .match-card__team {
   flex: 1;
-  font-size: 30rpx;
+  font-size: 26rpx;
   font-weight: 600;
 }
 
@@ -54,13 +38,13 @@
 }
 
 .match-card__score {
-  min-width: 150rpx;
+  min-width: 124rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   color: var(--theme-text-secondary);
-  font-size: 40rpx;
+  font-size: 34rpx;
   font-weight: 700;
   line-height: 1;
   flex: none;
@@ -73,9 +57,9 @@
 .match-card__meta {
   display: flex;
   justify-content: space-between;
-  gap: 20rpx;
-  margin-top: 18rpx;
-  font-size: 22rpx;
+  gap: 12rpx;
+  margin-top: 6rpx;
+  font-size: 18rpx;
   color: var(--theme-text-secondary);
 }
 

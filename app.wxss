@@ -31,7 +31,7 @@ image {
 
 .app-page {
   min-height: 100%;
-  padding-bottom: 168rpx;
+  padding-bottom: calc(280rpx + env(safe-area-inset-bottom));
   width: 100%;
   overflow-x: hidden;
 }
@@ -43,7 +43,7 @@ image {
 }
 
 .page-shell {
-  padding: 24rpx var(--page-padding) 0;
+  padding: 24rpx var(--page-padding) 32rpx;
   width: 100%;
   overflow-x: hidden;
 }
