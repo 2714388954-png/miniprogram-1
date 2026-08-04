@@ -1,0 +1,9 @@
+{
+  "name": "admin-update-stats",
+  "version": "1.0.0",
+  "description": "Update or create stats records for admin pages.",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

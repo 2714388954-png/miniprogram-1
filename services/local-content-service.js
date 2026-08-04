@@ -10,6 +10,11 @@ function normalizeMaybeEmpty(value) {
   return value === 'none' ? '' : value;
 }
 
+function normalizeReportTitle(value) {
+  const normalized = normalizeMaybeEmpty(value);
+  return normalized.replace(/^[A-Za-z0-9_-]+\s*\|\s*/, '');
+}
+
 function normalizeMatch(match) {
   if (!match) {
     return match;
@@ -20,7 +25,7 @@ function normalizeMatch(match) {
     recordKey: match._id || match.matchId,
     groupName: normalizeMaybeEmpty(match.groupName),
     reportNewsId: normalizeMaybeEmpty(match.reportNewsId),
-    reportTitle: normalizeMaybeEmpty(match.reportTitle),
+    reportTitle: normalizeReportTitle(match.reportTitle),
     report: normalizeMaybeEmpty(match.report),
     updatedAt: normalizeMaybeEmpty(match.updatedAt),
   };

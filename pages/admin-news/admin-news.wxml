@@ -59,7 +59,7 @@
       <scroll-view class="editor-scroll" scroll-y enhanced show-scrollbar="{{false}}">
         <view class="editor-head">
           <text class="section-title">{{editorTitle}}</text>
-          <text class="section-subtitle">保存后会同步更新首页新闻列表与新闻详情页。</text>
+          <text class="section-subtitle">建议先在比赛管理中建好比赛，再回来从列表选择要关联的比赛。</text>
         </view>
 
         <view class="form-grid">
@@ -111,8 +111,14 @@
         </view>
 
         <view class="form-field">
-          <text class="form-label">关联比赛编号</text>
-          <input class="form-input" value="{{formData.relatedMatchId}}" data-field="relatedMatchId" bindinput="handleFieldInput" bindblur="handleFieldInput" placeholder="可选，例如 match-003" />
+          <text class="form-label">关联比赛</text>
+          <picker mode="selector" range="{{matchOptions}}" range-key="label" value="{{matchOptionIndex}}" bindchange="handleRelatedMatchChange">
+            <view class="form-input form-input--picker">
+              <text class="form-input__text">{{matchOptions[matchOptionIndex].label}}</text>
+              <text class="form-input__arrow">▾</text>
+            </view>
+          </picker>
+          <text class="picker-detail">{{matchOptions[matchOptionIndex].detail}}</text>
         </view>
 
         <view class="switch-row">

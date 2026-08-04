@@ -22,7 +22,7 @@
       <view wx:if="{{currentEvent && currentEvent.eventType === 'cup'}}" class="display-mode-panel">
         <view class="display-mode-panel__head">
           <text class="display-mode-panel__title">前端优先展示</text>
-          <text class="display-mode-panel__desc">和新闻置顶类似，这里控制杯赛页面先显示哪一块内容。</text>
+          <text class="display-mode-panel__desc">这里控制杯赛页面优先展示小组赛还是淘汰赛内容。</text>
         </view>
         <view class="display-mode-options">
           <block wx:for="{{cupDisplayModeOptions}}" wx:key="value">
@@ -105,7 +105,9 @@
       </view>
     </view>
 
-    <view wx:if="{{!isLoading && !standingsRecords.length && !(currentEvent && currentEvent.eventType === 'cup' && knockoutStageGroups.length)}}" class="empty-state panel">当前赛事还没有积分榜数据。</view>
+    <view wx:if="{{!isLoading && !standingsRecords.length && !(currentEvent && currentEvent.eventType === 'cup' && knockoutStageGroups.length)}}" class="empty-state panel">
+      当前赛事还没有积分榜数据。
+    </view>
   </view>
 </scroll-view>
 
@@ -116,7 +118,7 @@
       <scroll-view class="editor-scroll" scroll-y enhanced show-scrollbar="{{false}}">
         <view class="editor-head">
           <text class="section-title">{{editorTitle}}</text>
-          <text class="section-subtitle">每行一支球队，格式：队名 | 赛 | 胜 | 平 | 负 | 进 | 失 | 净胜 | 积分</text>
+          <text class="section-subtitle">每行一支球队，格式：队名，赛，胜，平，负，进，失，净胜球，积分</text>
         </view>
 
         <view class="form-grid">
@@ -140,13 +142,18 @@
 
         <view class="form-field">
           <text class="form-label">积分榜内容</text>
+          <text class="field-tip">每行一队，格式：队名，赛，胜，平，负，进，失，净胜球，积分</text>
+          <view class="form-actions">
+            <view class="mini-action" bindtap="fillTableExample">填入示例</view>
+            <view class="mini-action mini-action--ghost" bindtap="clearTableText">清空输入框</view>
+          </view>
           <textarea
             class="form-textarea form-textarea--large"
             value="{{formData.tableText}}"
             data-field="tableText"
             bindinput="handleFieldInput"
             bindblur="handleFieldInput"
-            placeholder="例如：计算机学院 | 3 | 2 | 1 | 0 | 8 | 3 | 5 | 7"
+            placeholder="例如：&#10;经管学院，3，2，1，0，8，3，5，7&#10;机械学院，3，2，0，1，6，4，2，6"
           ></textarea>
         </view>
       </scroll-view>

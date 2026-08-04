@@ -29,7 +29,7 @@ function normalizeScorers(scorersText) {
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) => {
-      const [player = '', team = '', minute = ''] = line.split('|').map((item) => item.trim());
+      const [player = '', team = '', minute = ''] = line.split(/[，,]/).map((item) => item.trim());
       return {
         player,
         team,
@@ -108,6 +108,15 @@ async function findExistingMatch(payload) {
   return result.data && result.data[0] ? result.data[0] : null;
 }
 
+async function getRelatedNews(newsId) {
+  if (!newsId) {
+    return null;
+  }
+
+  const result = await db.collection('news').where({ newsId }).limit(1).get();
+  return result.data && result.data[0] ? result.data[0] : null;
+}
+
 async function updateMatchByRecordId(recordId, payload) {
   if (!recordId) {
     return {
@@ -127,7 +136,7 @@ async function updateMatchByRecordId(recordId, payload) {
 exports.main = async (event) => {
   const formData = event && event.formData ? event.formData : {};
   const payload = buildMatchPayload(formData);
-  let recordId = normalizeOptionalValue(formData.recordId);
+  const recordId = normalizeOptionalValue(formData.recordId);
   const expectedUpdatedAt = normalizeOptionalValue(formData.updatedAt);
 
   if (!payload.eventId || !payload.matchId || !payload.stage || !payload.homeTeam || !payload.awayTeam) {
@@ -145,12 +154,31 @@ exports.main = async (event) => {
   }
 
   try {
+    if (payload.reportNewsId) {
+      const relatedNews = await getRelatedNews(payload.reportNewsId);
+      if (!relatedNews) {
+        return {
+          success: false,
+          message: '所选关联新闻不存在，请重新选择后再保存。',
+        };
+      }
+    }
+
+    const existingMatch = await findExistingMatch(payload);
+
     if (recordId) {
       const currentRecord = await getMatchByRecordId(recordId);
       if (!currentRecord) {
         return {
           success: false,
           message: '这条比赛记录不存在或已被删除，请重新进入后再编辑。',
+        };
+      }
+
+      if (existingMatch && existingMatch._id !== recordId) {
+        return {
+          success: false,
+          message: `比赛编号重复：${payload.matchId} 在当前赛事中已存在，请更换编号。`,
         };
       }
 
@@ -169,59 +197,41 @@ exports.main = async (event) => {
         };
       }
 
-      const primaryUpdate = await updateMatchByRecordId(recordId, payload);
-
-      if (!primaryUpdate.updated) {
-        const existing = await findExistingMatch(payload);
-        if (!existing || !existing._id) {
-          return {
-            success: false,
-            message: `未找到可更新记录。编辑记录ID：${recordId || '[空]'}；赛事：${payload.eventId}；比赛编号：${payload.matchId}`,
-          };
-        }
-
-        recordId = existing._id;
-        const fallbackUpdatedAt = normalizeOptionalValue(existing.updatedAt);
-        if (expectedUpdatedAt && fallbackUpdatedAt && expectedUpdatedAt !== fallbackUpdatedAt) {
-          return {
-            success: false,
-            message: '这场比赛已被其他管理员更新，请重新打开后再编辑。',
-          };
-        }
-
-        const fallbackUpdate = await updateMatchByRecordId(recordId, payload);
-        if (!fallbackUpdate.updated) {
-          return {
-            success: false,
-            message: `记录已定位但更新失败。编辑记录ID：${normalizeOptionalValue(formData.recordId) || '[空]'}；回退记录ID：${recordId}`,
-          };
-        }
+      const updateResult = await updateMatchByRecordId(recordId, payload);
+      if (!updateResult.updated) {
+        return {
+          success: false,
+          message: '比赛记录未能更新，请稍后重试。',
+        };
       }
     } else {
-      const existing = await findExistingMatch(payload);
-
-      if (existing && existing._id) {
-        if (isSameMatchContent(existing, payload)) {
-          return {
-            success: false,
-            message: '内容未发生修改。',
-          };
-        }
-
-        recordId = existing._id;
-        const updateResult = await updateMatchByRecordId(recordId, payload);
-        if (!updateResult.updated) {
-          return {
-            success: false,
-            message: `通过赛事+比赛编号定位到记录，但更新失败。记录ID：${recordId}`,
-          };
-        }
-      } else {
-        const addResult = await db.collection('matches').add({
-          data: payload,
-        });
-        recordId = addResult && addResult._id ? addResult._id : '';
+      if (existingMatch) {
+        return {
+          success: false,
+          message: `比赛编号重复：${payload.matchId} 在当前赛事中已存在，请使用新的比赛编号。`,
+        };
       }
+
+      const addResult = await db.collection('matches').add({
+        data: payload,
+      });
+
+      if (!addResult || !addResult._id) {
+        return {
+          success: false,
+          message: '比赛新增失败，请稍后重试。',
+        };
+      }
+
+      const savedRecord = await getMatchByRecordId(addResult._id);
+      return {
+        success: true,
+        message: '比赛保存成功',
+        data: savedRecord || {
+          ...payload,
+          _id: addResult._id,
+        },
+      };
     }
 
     const savedRecord = await getMatchByRecordId(recordId);
@@ -235,17 +245,14 @@ exports.main = async (event) => {
     if ((savedRecord.report || '') !== payload.report) {
       return {
         success: false,
-        message: `简短战报写入校验失败。提交值：${payload.report || '[空]'}；数据库值：${savedRecord.report || '[空]'}`,
+        message: '简短战报写入校验失败，请稍后重试。',
       };
     }
 
     return {
       success: true,
       message: '比赛保存成功',
-      data: {
-        ...payload,
-        _id: recordId,
-      },
+      data: savedRecord,
     };
   } catch (error) {
     return {

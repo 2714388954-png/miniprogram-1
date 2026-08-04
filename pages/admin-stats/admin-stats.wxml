@@ -1,12 +1,109 @@
-<app-nav-bar title="数据榜管理" back="{{false}}" color="#15314b" background="transparent"></app-nav-bar>
+<app-nav-bar title="{{pageTitle}}" back="{{false}}" color="#15314b" background="transparent"></app-nav-bar>
 <scroll-view class="page-scroll" scroll-y>
   <view class="page-shell page-shell--safe admin-shell">
     <view class="page-top-actions">
-      <view class="page-back-btn" bindtap="handleBack">返回</view>
+      <view class="page-back-btn" bindtap="handleBack">{{backText}}</view>
     </view>
-    <view class="panel placeholder-card">
-      <text class="section-title">数据榜管理开发中</text>
-      <text class="section-subtitle">下一步会在这里接入进球榜、助攻榜、黄牌榜和红牌榜的维护功能。</text>
+
+    <view class="panel stats-toolbar">
+      <text class="toolbar-label">{{toolbarEventLabel}}</text>
+      <scroll-view class="admin-event-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
+        <block wx:for="{{events}}" wx:key="eventId">
+          <view
+            class="admin-event-tab {{activeEventId === item.eventId ? 'admin-event-tab--active' : ''}}"
+            bindtap="handleEventSwitch"
+            data-event-id="{{item.eventId}}"
+          >
+            {{item.eventName}}
+          </view>
+        </block>
+      </scroll-view>
+    </view>
+
+    <view wx:if="{{isLoading}}" class="loading-panel panel">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">{{loadingText}}</text>
+    </view>
+
+    <view wx:if="{{!isLoading}}" class="stats-body">
+      <view class="panel stat-type-panel">
+        <text class="toolbar-label">{{statTypeLabel}}</text>
+        <view class="stat-type-tabs">
+          <block wx:for="{{statTypeOptions}}" wx:key="value">
+            <view
+              class="stat-type-tab {{activeStatType === item.value ? 'stat-type-tab--active' : ''}}"
+              bindtap="handleStatTypeSwitch"
+              data-stat-type="{{item.value}}"
+            >
+              {{item.label}}
+            </view>
+          </block>
+        </view>
+        <view class="toolbar-action" bindtap="openEditor">{{editCurrentLabel}}</view>
+      </view>
+
+      <view class="panel stat-preview-card">
+        <view class="stat-preview-card__head">
+          <view>
+            <text class="section-title">{{activeStatLabel}}</text>
+            <text class="section-subtitle">{{inputHintText}}</text>
+          </view>
+          <text class="stat-preview-card__unit">{{unitPrefix}}{{activeStatUnit}}</text>
+        </view>
+
+        <view wx:if="{{currentRecord && currentRecord.list && currentRecord.list.length}}" class="stat-preview-list">
+          <block wx:for="{{currentRecord.list}}" wx:key="playerId">
+            <view class="stat-preview-row">
+              <view class="stat-preview-rank {{index < 3 ? 'stat-preview-rank--top' : ''}}">{{index + 1}}</view>
+              <view class="stat-preview-main">
+                <text class="stat-preview-name">{{item.playerName}}</text>
+                <text class="stat-preview-team">{{item.teamName}}</text>
+              </view>
+              <text class="stat-preview-value">{{item.value}}</text>
+            </view>
+          </block>
+        </view>
+
+        <view wx:if="{{!currentRecord || !currentRecord.list || !currentRecord.list.length}}" class="empty-state">
+          {{emptyText}}
+        </view>
+      </view>
     </view>
   </view>
 </scroll-view>
+
+<view wx:if="{{showEditor}}" class="editor-mask" bindtap="closeEditor">
+  <view class="editor-sheet" catchtap="noop">
+    <view class="editor-form-shell">
+      <view class="editor-sheet__handle"></view>
+      <scroll-view class="editor-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="editor-head">
+          <text class="section-title">{{editorTitle}}</text>
+          <text class="section-subtitle">{{editorHintText}}</text>
+        </view>
+
+        <view class="form-actions">
+          <view class="mini-action" bindtap="fillExample">{{fillExampleText}}</view>
+          <view class="mini-action mini-action--ghost" bindtap="clearCurrentText">{{clearInputText}}</view>
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">{{listContentLabel}}</text>
+          <textarea
+            class="form-textarea form-textarea--large"
+            value="{{formData.listText}}"
+            data-field="listText"
+            bindinput="handleFieldInput"
+            bindblur="handleFieldInput"
+            placeholder="{{editorPlaceholder}}"
+          ></textarea>
+        </view>
+      </scroll-view>
+
+      <view class="editor-actions">
+        <view class="editor-btn editor-btn--ghost" bindtap="closeEditor">{{cancelText}}</view>
+        <view class="editor-btn editor-btn--primary" bindtap="handleSaveTap">{{isSaving ? saveLoadingText : saveIdleText}}</view>
+      </view>
+    </view>
+  </view>
+</view>

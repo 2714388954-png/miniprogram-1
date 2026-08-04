@@ -240,6 +240,19 @@
 .form-input--picker {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.form-input__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-input__arrow {
+  flex: none;
+  color: var(--theme-text-secondary);
+  font-size: 24rpx;
 }
 
 .form-textarea {
@@ -251,6 +264,27 @@
 
 .form-textarea--compact {
   min-height: 180rpx;
+}
+
+.picker-detail {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: var(--theme-text-secondary);
+}
+
+.form-readonly {
+  width: 100%;
+  margin-top: 12rpx;
+  min-height: 84rpx;
+  padding: 20rpx;
+  border-radius: 22rpx;
+  background: #f8fbff;
+  border: 1rpx solid rgba(13, 95, 212, 0.1);
+  font-size: 28rpx;
+  line-height: 1.6;
+  color: var(--theme-text);
+  box-sizing: border-box;
 }
 
 .editor-actions {
@@ -278,4 +312,28 @@
 .editor-btn--primary {
   background: var(--theme-primary);
   color: #ffffff;
+}
+
+.form-actions {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 12rpx;
+}
+
+.mini-action {
+  flex: 1;
+  min-height: 72rpx;
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13, 95, 212, 0.1);
+  color: var(--theme-primary);
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.mini-action--ghost {
+  background: #eef4fb;
+  color: var(--theme-text-secondary);
 }

@@ -35,7 +35,7 @@ function formatTableText(table) {
       item.goalsAgainst ?? '',
       item.goalDiff ?? '',
       item.points ?? '',
-    ].join(' | '))
+    ].join('，'))
     .join('\n');
 }
 

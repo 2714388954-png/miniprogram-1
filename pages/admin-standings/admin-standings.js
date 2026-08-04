@@ -254,6 +254,34 @@ Page({
     });
   },
 
+  fillTableExample() {
+    const tableText = [
+      '经管学院，3，2，1，0，8，3，5，7',
+      '机械学院，3，2，0，1，6，4，2，6',
+      '计算机学院，3，1，1，1，5，5，0，4',
+    ].join('\n');
+
+    this.draftFormData = {
+      ...(this.draftFormData || {}),
+      tableText,
+    };
+
+    this.setData({
+      'formData.tableText': tableText,
+    });
+  },
+
+  clearTableText() {
+    this.draftFormData = {
+      ...(this.draftFormData || {}),
+      tableText: '',
+    };
+
+    this.setData({
+      'formData.tableText': '',
+    });
+  },
+
   handleTableTypeChange(event) {
     const tableTypeIndex = Number(event.detail.value);
     const target = this.data.tableTypeOptions[tableTypeIndex];

@@ -222,6 +222,24 @@
   box-sizing: border-box;
 }
 
+.form-input--picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.form-input__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-input__arrow {
+  flex: none;
+  color: var(--theme-text-secondary);
+  font-size: 24rpx;
+}
+
 .form-textarea {
   min-height: 200rpx;
   height: auto;
@@ -235,6 +253,13 @@
 
 .form-textarea--large {
   min-height: 360rpx;
+}
+
+.picker-detail {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: var(--theme-text-secondary);
 }
 
 .cover-actions {

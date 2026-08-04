@@ -433,3 +433,34 @@
   background: var(--theme-primary);
   color: #ffffff;
 }
+
+.field-tip {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: var(--theme-text-secondary);
+}
+
+.form-actions {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 12rpx;
+}
+
+.mini-action {
+  flex: 1;
+  min-height: 72rpx;
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13, 95, 212, 0.1);
+  color: var(--theme-primary);
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.mini-action--ghost {
+  background: #eef4fb;
+  color: var(--theme-text-secondary);
+}

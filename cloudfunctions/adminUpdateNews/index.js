@@ -57,7 +57,8 @@ function buildComparablePayload(payload) {
     category: payload.category || '',
     isFeatured: !!payload.isFeatured,
     isPinned: !!payload.isPinned,
-    sortOrder: typeof payload.sortOrder === 'number' ? payload.sortOrder : normalizeSortOrder(payload.sortOrder),
+    sortOrder:
+      typeof payload.sortOrder === 'number' ? payload.sortOrder : normalizeSortOrder(payload.sortOrder),
     content: payload.content || '',
     relatedMatchId: payload.relatedMatchId || '',
   };
@@ -80,10 +81,19 @@ async function getNewsByRecordId(recordId) {
   }
 }
 
-async function findExistingNews(payload) {
-  const result = await db.collection('news').where({
-    eventId: payload.eventId,
-    newsId: payload.newsId,
+async function findExistingNewsByNewsId(newsId) {
+  const result = await db.collection('news').where({ newsId }).limit(1).get();
+  return result.data && result.data[0] ? result.data[0] : null;
+}
+
+async function getRelatedMatch(matchId, eventId) {
+  if (!matchId) {
+    return null;
+  }
+
+  const result = await db.collection('matches').where({
+    eventId,
+    matchId,
   }).limit(1).get();
 
   return result.data && result.data[0] ? result.data[0] : null;
@@ -106,7 +116,7 @@ async function updateNewsByRecordId(recordId, payload) {
 exports.main = async (event) => {
   const formData = event && event.formData ? event.formData : {};
   const payload = buildNewsPayload(formData);
-  let recordId = normalizeOptionalValue(formData.recordId);
+  const recordId = normalizeOptionalValue(formData.recordId);
   const expectedUpdatedAt = normalizeOptionalValue(formData.updatedAt);
 
   if (!payload.eventId || !payload.newsId || !payload.title || !payload.summary || !payload.publishTime || !payload.category || !payload.content) {
@@ -117,12 +127,31 @@ exports.main = async (event) => {
   }
 
   try {
+    if (payload.relatedMatchId) {
+      const relatedMatch = await getRelatedMatch(payload.relatedMatchId, payload.eventId);
+      if (!relatedMatch) {
+        return {
+          success: false,
+          message: '所选关联比赛不存在，请重新选择后再保存。',
+        };
+      }
+    }
+
+    const existingByNewsId = await findExistingNewsByNewsId(payload.newsId);
+
     if (recordId) {
       const currentRecord = await getNewsByRecordId(recordId);
       if (!currentRecord) {
         return {
           success: false,
           message: '这条新闻不存在或已被删除，请重新进入后再编辑。',
+        };
+      }
+
+      if (existingByNewsId && existingByNewsId._id !== recordId) {
+        return {
+          success: false,
+          message: `新闻编号重复：${payload.newsId} 已被另一篇新闻使用，请更换编号。`,
         };
       }
 
@@ -141,64 +170,41 @@ exports.main = async (event) => {
         };
       }
 
-      const primaryUpdate = await updateNewsByRecordId(recordId, payload);
-      if (!primaryUpdate.updated) {
-        const existing = await findExistingNews(payload);
-        if (!existing || !existing._id) {
-          return {
-            success: false,
-            message: `未找到可更新新闻。编辑记录ID：${recordId || '[空]'}；赛事：${payload.eventId}；新闻编号：${payload.newsId}`,
-          };
-        }
-
-        recordId = existing._id;
-        const fallbackUpdatedAt = normalizeOptionalValue(existing.updatedAt);
-        if (expectedUpdatedAt && fallbackUpdatedAt && expectedUpdatedAt !== fallbackUpdatedAt) {
-          return {
-            success: false,
-            message: '这条新闻已被其他管理员更新，请重新打开后再编辑。',
-          };
-        }
-
-        if (isSameNewsContent(existing, payload)) {
-          return {
-            success: false,
-            message: '内容未发生修改。',
-          };
-        }
-
-        const fallbackUpdate = await updateNewsByRecordId(recordId, payload);
-        if (!fallbackUpdate.updated) {
-          return {
-            success: false,
-            message: `新闻已定位但更新失败。编辑记录ID：${normalizeOptionalValue(formData.recordId) || '[空]'}；回退记录ID：${recordId}`,
-          };
-        }
+      const updateResult = await updateNewsByRecordId(recordId, payload);
+      if (!updateResult.updated) {
+        return {
+          success: false,
+          message: '新闻记录未能更新，请稍后重试。',
+        };
       }
     } else {
-      const existing = await findExistingNews(payload);
-      if (existing && existing._id) {
-        if (isSameNewsContent(existing, payload)) {
-          return {
-            success: false,
-            message: '内容未发生修改。',
-          };
-        }
-
-        recordId = existing._id;
-        const updateResult = await updateNewsByRecordId(recordId, payload);
-        if (!updateResult.updated) {
-          return {
-            success: false,
-            message: `通过赛事+新闻编号定位到记录，但更新失败。记录ID：${recordId}`,
-          };
-        }
-      } else {
-        const addResult = await db.collection('news').add({
-          data: payload,
-        });
-        recordId = addResult && addResult._id ? addResult._id : '';
+      if (existingByNewsId) {
+        return {
+          success: false,
+          message: `新闻编号重复：${payload.newsId} 已存在，请使用新的新闻编号。`,
+        };
       }
+
+      const addResult = await db.collection('news').add({
+        data: payload,
+      });
+
+      if (!addResult || !addResult._id) {
+        return {
+          success: false,
+          message: '新闻新增失败，请稍后重试。',
+        };
+      }
+
+      const savedRecord = await getNewsByRecordId(addResult._id);
+      return {
+        success: true,
+        message: '新闻保存成功',
+        data: savedRecord || {
+          ...payload,
+          _id: addResult._id,
+        },
+      };
     }
 
     const savedRecord = await getNewsByRecordId(recordId);
@@ -212,17 +218,14 @@ exports.main = async (event) => {
     if ((savedRecord.content || '') !== payload.content) {
       return {
         success: false,
-        message: `正文写入校验失败。提交值：${payload.content || '[空]'}；数据库值：${savedRecord.content || '[空]'}`,
+        message: '新闻正文写入校验失败，请稍后重试。',
       };
     }
 
     return {
       success: true,
       message: '新闻保存成功',
-      data: {
-        ...payload,
-        _id: recordId,
-      },
+      data: savedRecord,
     };
   } catch (error) {
     return {

@@ -35,8 +35,35 @@ function createEmptyForm(eventId) {
 
 function buildScorersText(scorers) {
   return (scorers || [])
-    .map((item) => [item.player || '', item.team || '', item.minute || ''].join(' | '))
+    .map((item) => [item.player || '', item.team || '', item.minute || ''].join('，'))
     .join('\n');
+}
+
+function buildNewsOptions(newsList) {
+  const options = [
+    {
+      value: '',
+      title: '不关联新闻',
+      rawTitle: '',
+      detail: '这场比赛暂时不跳转战报',
+    },
+  ];
+
+  (newsList || []).forEach((item) => {
+    options.push({
+      value: item.newsId,
+      title: `${item.newsId} | ${item.title || '未命名新闻'}`,
+      rawTitle: item.title || '',
+      detail: `${item.newsId} · ${item.publishTime || '未填写发布时间'}`,
+    });
+  });
+
+  return options;
+}
+
+function findOptionIndex(options, targetValue) {
+  const index = (options || []).findIndex((item) => item.value === targetValue);
+  return index >= 0 ? index : 0;
 }
 
 Page({
@@ -46,6 +73,8 @@ Page({
     activeEventId: '',
     currentEvent: null,
     stageGroups: [],
+    newsOptions: buildNewsOptions([]),
+    newsOptionIndex: 0,
     isLoading: true,
     showEditor: false,
     isSaving: false,
@@ -57,7 +86,6 @@ Page({
   },
 
   draftFormData: createEmptyForm(''),
-
   pendingOpenParams: null,
 
   async onLoad(options) {
@@ -100,15 +128,14 @@ Page({
   },
 
   async loadMatchesForEvent(events, eventId) {
-    const [stageGroups, currentEvent] = await Promise.all([
+    const [stageGroups, currentEvent, newsList] = await Promise.all([
       eventId ? matchAdminService.getMatchesByEvent(eventId) : [],
       eventId ? contentService.getEventById(eventId) : null,
+      eventId ? contentService.getNewsByEvent(eventId) : [],
     ]);
-    const eventIndex = Math.max(
-      0,
-      events.findIndex((item) => item.eventId === eventId)
-    );
+    const eventIndex = Math.max(0, events.findIndex((item) => item.eventId === eventId));
     const nextFormData = createEmptyForm(eventId);
+    const newsOptions = buildNewsOptions(newsList);
 
     this.setData({
       events,
@@ -116,6 +143,8 @@ Page({
       activeEventId: eventId,
       currentEvent,
       stageGroups,
+      newsOptions,
+      newsOptionIndex: 0,
       showEditor: false,
       formData: nextFormData,
       statusIndex: 0,
@@ -162,6 +191,7 @@ Page({
       showEditor: true,
       editorTitle: '新增比赛',
       formData: nextFormData,
+      newsOptionIndex: 0,
       statusIndex: 0,
     });
     this.draftFormData = { ...nextFormData };
@@ -176,7 +206,7 @@ Page({
 
     const statusIndex = Math.max(
       0,
-      this.data.statusOptions.findIndex((item) => item.value === matchItem.status)
+      this.data.statusOptions.findIndex((item) => item.value === matchItem.status),
     );
 
     const nextFormData = {
@@ -192,23 +222,21 @@ Page({
       location: matchItem.location,
       status: matchItem.status,
       homeScore:
-        matchItem.homeScore === null || matchItem.homeScore === undefined
-          ? ''
-          : String(matchItem.homeScore),
+        matchItem.homeScore === null || matchItem.homeScore === undefined ? '' : String(matchItem.homeScore),
       awayScore:
-        matchItem.awayScore === null || matchItem.awayScore === undefined
-          ? ''
-          : String(matchItem.awayScore),
+        matchItem.awayScore === null || matchItem.awayScore === undefined ? '' : String(matchItem.awayScore),
       reportNewsId: matchItem.reportNewsId || '',
       reportTitle: matchItem.reportTitle || '',
       scorersText: buildScorersText(matchItem.scorers),
       report: matchItem.report || '',
     };
+    const newsOptionIndex = findOptionIndex(this.data.newsOptions, nextFormData.reportNewsId);
 
     this.setData({
       showEditor: true,
       editorTitle: '编辑比赛',
       statusIndex,
+      newsOptionIndex,
       formData: nextFormData,
     });
     this.draftFormData = { ...nextFormData };
@@ -219,6 +247,7 @@ Page({
     this.setData({
       showEditor: false,
       formData: nextFormData,
+      newsOptionIndex: 0,
       statusIndex: 0,
     });
     this.draftFormData = { ...nextFormData };
@@ -238,15 +267,37 @@ Page({
     });
   },
 
+  fillScorersExample() {
+    const scorersText = ['张三，经管学院，28', '李四，机械学院，64'].join('\n');
+
+    this.draftFormData = {
+      ...(this.draftFormData || {}),
+      scorersText,
+    };
+
+    this.setData({
+      'formData.scorersText': scorersText,
+    });
+  },
+
+  clearScorersText() {
+    this.draftFormData = {
+      ...(this.draftFormData || {}),
+      scorersText: '',
+    };
+
+    this.setData({
+      'formData.scorersText': '',
+    });
+  },
+
   applyCupStagePreset(event) {
     const { stage } = event.currentTarget.dataset;
     if (!stage) {
       return;
     }
 
-    const nextPatch = {
-      stage,
-    };
+    const nextPatch = { stage };
 
     if (stage !== '小组赛') {
       nextPatch.groupName = '';
@@ -281,12 +332,30 @@ Page({
     });
   },
 
+  handleRelatedNewsChange(event) {
+    const newsOptionIndex = Number(event.detail.value);
+    const target = this.data.newsOptions[newsOptionIndex] || this.data.newsOptions[0];
+    const reportNewsId = target ? target.value : '';
+    const reportTitle = reportNewsId ? (target.rawTitle || '') : '';
+
+    this.draftFormData = {
+      ...(this.draftFormData || {}),
+      reportNewsId,
+      reportTitle,
+    };
+
+    this.setData({
+      newsOptionIndex,
+      'formData.reportNewsId': reportNewsId,
+      'formData.reportTitle': reportTitle,
+    });
+  },
+
   handleSaveTap() {
     if (this.data.isSaving) {
       return;
     }
 
-    // Give iOS input/textarea blur events a brief moment to flush latest text.
     setTimeout(() => {
       this.submitMatch();
     }, 80);
@@ -347,13 +416,13 @@ Page({
         icon: 'success',
       });
 
-      const stageGroups = await matchAdminService.getMatchesByEvent(activeEventId);
       const nextFormData = createEmptyForm(activeEventId);
+      await this.loadMatchesForEvent(this.data.events, activeEventId);
 
       this.setData({
-        stageGroups,
         showEditor: false,
         formData: nextFormData,
+        newsOptionIndex: 0,
         statusIndex: 0,
       });
       this.draftFormData = { ...nextFormData };

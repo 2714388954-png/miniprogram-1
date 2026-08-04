@@ -10,6 +10,7 @@ function normalizeOptionalValue(value) {
   if (value === undefined || value === null) {
     return '';
   }
+
   const normalized = String(value).trim();
   return normalized === 'none' ? '' : normalized;
 }
@@ -18,6 +19,7 @@ function normalizeSortOrder(value) {
   if (value === '' || value === null || value === undefined) {
     return 0;
   }
+
   const parsed = Number(value);
   return Number.isNaN(parsed) ? 0 : parsed;
 }
@@ -31,15 +33,21 @@ function slugify(value) {
     .replace(/^-|-$/g, '') || 'team';
 }
 
+function splitLine(line) {
+  return String(line || '')
+    .split(/[，,]/)
+    .map((item) => item.trim());
+}
+
 function parseTableText(tableText, tableType, groupName) {
   return String(tableText || '')
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line, index) => {
-      const columns = line.split('|').map((item) => item.trim());
+      const columns = splitLine(line);
       if (columns.length < 9) {
-        throw new Error(`第 ${index + 1} 行格式不完整，请按“队名 | 赛 | 胜 | 平 | 负 | 进 | 失 | 净胜 | 积分”填写。`);
+        throw new Error(`第 ${index + 1} 行格式不完整，请按“队名，赛，胜，平，负，进，失，净胜球，积分”填写。`);
       }
 
       const [
@@ -202,7 +210,7 @@ exports.main = async (event) => {
         if (!existing || !existing._id) {
           return {
             success: false,
-            message: `未找到可更新积分榜。编辑记录ID：${recordId || '[空]'}；赛事：${payload.eventId}`,
+            message: '未找到可更新积分榜，请稍后重试。',
           };
         }
 
@@ -226,7 +234,7 @@ exports.main = async (event) => {
         if (!fallbackResult.updated) {
           return {
             success: false,
-            message: `积分榜已定位但更新失败。编辑记录ID：${recordIdFromForm || '[空]'}；回退记录ID：${recordId}`,
+            message: '积分榜已定位但更新失败，请稍后重试。',
           };
         }
       }
@@ -245,7 +253,7 @@ exports.main = async (event) => {
         if (!updateResult.updated) {
           return {
             success: false,
-            message: `通过赛事与榜单类型定位到记录，但更新失败。记录ID：${recordId}`,
+            message: '已找到原有积分榜，但更新失败，请稍后重试。',
           };
         }
       } else {

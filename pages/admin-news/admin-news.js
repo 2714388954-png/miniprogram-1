@@ -9,12 +9,41 @@ function normalizeSortOrder(value) {
   return String(value);
 }
 
+function buildMatchOptions(stageGroups) {
+  const options = [
+    {
+      value: '',
+      label: '不关联比赛',
+      detail: '这篇新闻不绑定具体比赛',
+    },
+  ];
+
+  (stageGroups || []).forEach((group) => {
+    (group.matches || []).forEach((match) => {
+      options.push({
+        value: match.matchId,
+        label: `${match.matchId} | ${match.homeTeam} vs ${match.awayTeam}`,
+        detail: `${match.stage} · ${match.matchTime}`,
+      });
+    });
+  });
+
+  return options;
+}
+
+function findOptionIndex(options, targetValue) {
+  const index = (options || []).findIndex((item) => item.value === targetValue);
+  return index >= 0 ? index : 0;
+}
+
 Page({
   data: {
     events: [],
     activeEventId: '',
     eventIndex: 0,
     newsList: [],
+    matchOptions: buildMatchOptions([]),
+    matchOptionIndex: 0,
     isLoading: true,
     showEditor: false,
     isSaving: false,
@@ -58,18 +87,21 @@ Page({
   },
 
   async loadNewsForEvent(events, eventId) {
-    const newsList = eventId ? await newsAdminService.getNewsByEvent(eventId) : [];
-    const eventIndex = Math.max(
-      0,
-      events.findIndex((item) => item.eventId === eventId)
-    );
+    const [newsList, stageGroups] = await Promise.all([
+      eventId ? newsAdminService.getNewsByEvent(eventId) : [],
+      eventId ? contentService.getGroupedMatchesByEvent(eventId) : [],
+    ]);
+    const eventIndex = Math.max(0, events.findIndex((item) => item.eventId === eventId));
     const nextFormData = newsAdminService.createEmptyNewsForm(eventId);
+    const matchOptions = buildMatchOptions(stageGroups);
 
     this.setData({
       events,
       eventIndex,
       activeEventId: eventId,
       newsList,
+      matchOptions,
+      matchOptionIndex: 0,
       showEditor: false,
       formData: nextFormData,
     });
@@ -97,6 +129,7 @@ Page({
     this.setData({
       showEditor: true,
       editorTitle: '新增新闻',
+      matchOptionIndex: 0,
       formData: nextFormData,
     });
     this.draftFormData = { ...nextFormData };
@@ -125,10 +158,12 @@ Page({
       content: newsItem.content || '',
       relatedMatchId: newsItem.relatedMatchId || '',
     };
+    const matchOptionIndex = findOptionIndex(this.data.matchOptions, nextFormData.relatedMatchId);
 
     this.setData({
       showEditor: true,
       editorTitle: '编辑新闻',
+      matchOptionIndex,
       formData: nextFormData,
     });
     this.draftFormData = { ...nextFormData };
@@ -138,6 +173,7 @@ Page({
     const nextFormData = newsAdminService.createEmptyNewsForm(this.data.activeEventId);
     this.setData({
       showEditor: false,
+      matchOptionIndex: 0,
       formData: nextFormData,
     });
     this.draftFormData = { ...nextFormData };
@@ -168,6 +204,22 @@ Page({
 
     this.setData({
       [`formData.${field}`]: nextValue,
+    });
+  },
+
+  handleRelatedMatchChange(event) {
+    const matchOptionIndex = Number(event.detail.value);
+    const target = this.data.matchOptions[matchOptionIndex] || this.data.matchOptions[0];
+    const relatedMatchId = target ? target.value : '';
+
+    this.draftFormData = {
+      ...(this.draftFormData || {}),
+      relatedMatchId,
+    };
+
+    this.setData({
+      matchOptionIndex,
+      'formData.relatedMatchId': relatedMatchId,
     });
   },
 
@@ -285,12 +337,12 @@ Page({
         icon: 'success',
       });
 
-      const newsList = await newsAdminService.getNewsByEvent(activeEventId);
       const nextFormData = newsAdminService.createEmptyNewsForm(activeEventId);
+      await this.loadNewsForEvent(this.data.events, activeEventId);
       this.setData({
-        newsList,
         showEditor: false,
         formData: nextFormData,
+        matchOptionIndex: 0,
       });
       this.draftFormData = { ...nextFormData };
     } catch (error) {
@@ -352,12 +404,12 @@ Page({
         icon: 'success',
       });
 
-      const newsList = await newsAdminService.getNewsByEvent(this.data.activeEventId);
       const nextFormData = newsAdminService.createEmptyNewsForm(this.data.activeEventId);
+      await this.loadNewsForEvent(this.data.events, this.data.activeEventId);
       this.setData({
-        newsList,
         showEditor: false,
         formData: nextFormData,
+        matchOptionIndex: 0,
       });
       this.draftFormData = { ...nextFormData };
     } catch (error) {
