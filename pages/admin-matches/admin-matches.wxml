@@ -3,6 +3,10 @@
   <view class="page-shell page-shell--safe admin-shell">
     <view class="page-top-actions">
       <view class="page-back-btn" bindtap="handleBack">返回</view>
+      <view class="top-actions-group">
+        <view class="top-mini-action" bindtap="openEventEditor">编辑赛事</view>
+        <view class="top-mini-action" bindtap="openCreateEventForm">新增赛事</view>
+      </view>
     </view>
 
     <view class="panel matches-toolbar">
@@ -53,6 +57,92 @@
     <view wx:if="{{!isLoading && !stageGroups.length}}" class="empty-state panel">当前赛事还没有比赛数据。</view>
   </view>
 </scroll-view>
+
+<view wx:if="{{showEventEditor}}" class="editor-mask" bindtap="closeEventEditor">
+  <view class="editor-sheet" catchtap="noop">
+    <view class="editor-form-shell">
+      <view class="editor-sheet__handle"></view>
+      <scroll-view class="editor-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="editor-head">
+          <text class="section-title">{{eventEditorTitle}}</text>
+          <text class="section-subtitle">这里管理赛事本身的信息，保存后会同步影响首页、赛程、积分榜和数据榜的赛事列表。</text>
+        </view>
+
+        <view class="form-grid">
+          <view class="form-field">
+            <text class="form-label">赛事编号</text>
+            <input class="form-input" value="{{eventFormData.eventId}}" data-field="eventId" bindinput="handleEventFieldInput" bindblur="handleEventFieldInput" placeholder="例如 2026-summer-cup" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">赛事简称</text>
+            <input class="form-input" value="{{eventFormData.eventName}}" data-field="eventName" bindinput="handleEventFieldInput" bindblur="handleEventFieldInput" placeholder="例如 2026夏季杯" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">赛事全称</text>
+            <input class="form-input" value="{{eventFormData.fullName}}" data-field="fullName" bindinput="handleEventFieldInput" bindblur="handleEventFieldInput" placeholder="请输入完整赛事名称" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">赛季</text>
+            <input class="form-input" value="{{eventFormData.season}}" data-field="season" bindinput="handleEventFieldInput" bindblur="handleEventFieldInput" placeholder="例如 2026" />
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">赛事类型</text>
+            <picker mode="selector" range="{{eventTypeOptions}}" range-key="label" value="{{eventTypeIndex}}" bindchange="handleEventTypeChange">
+              <view class="form-input form-input--picker">
+                <text class="form-input__text">{{eventTypeOptions[eventTypeIndex].label}}</text>
+                <text class="form-input__arrow">▾</text>
+              </view>
+            </picker>
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">赛事状态</text>
+            <picker mode="selector" range="{{eventStatusOptions}}" range-key="label" value="{{eventStatusIndex}}" bindchange="handleEventStatusChange">
+              <view class="form-input form-input--picker">
+                <text class="form-input__text">{{eventStatusOptions[eventStatusIndex].label}}</text>
+                <text class="form-input__arrow">▾</text>
+              </view>
+            </picker>
+          </view>
+
+          <view class="form-field" wx:if="{{eventFormData.eventType === 'cup'}}">
+            <text class="form-label">杯赛展示优先</text>
+            <picker mode="selector" range="{{cupDisplayModeOptions}}" range-key="label" value="{{eventDisplayModeIndex}}" bindchange="handleEventDisplayModeChange">
+              <view class="form-input form-input--picker">
+                <text class="form-input__text">{{cupDisplayModeOptions[eventDisplayModeIndex].label}}</text>
+                <text class="form-input__arrow">▾</text>
+              </view>
+            </picker>
+          </view>
+
+          <view class="form-field">
+            <text class="form-label">排序值</text>
+            <input class="form-input" type="number" value="{{eventFormData.sortOrder}}" data-field="sortOrder" bindinput="handleEventFieldInput" bindblur="handleEventFieldInput" placeholder="数字越小越靠前" />
+          </view>
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">赛事简介</text>
+          <textarea class="form-textarea form-textarea--compact" value="{{eventFormData.description}}" data-field="description" bindinput="handleEventFieldInput" bindblur="handleEventFieldInput" placeholder="请输入赛事简介"></textarea>
+        </view>
+
+        <view class="form-field">
+          <text class="form-label">封面图地址</text>
+          <input class="form-input" value="{{eventFormData.coverImage}}" data-field="coverImage" bindinput="handleEventFieldInput" bindblur="handleEventFieldInput" placeholder="例如 /assets/covers/cup-cover.svg" />
+        </view>
+      </scroll-view>
+
+      <view class="editor-actions">
+        <view class="editor-btn editor-btn--ghost" bindtap="closeEventEditor">取消</view>
+        <view class="editor-btn editor-btn--primary" bindtap="handleSaveEventTap">{{isSavingEvent ? '保存中...' : '保存赛事'}}</view>
+      </view>
+    </view>
+  </view>
+</view>
 
 <view wx:if="{{showEditor}}" class="editor-mask" bindtap="closeEditor">
   <view class="editor-sheet" catchtap="noop">

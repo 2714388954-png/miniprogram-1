@@ -127,8 +127,31 @@ function getNewsByEvent(eventId) {
     .map(normalizeNewsItem);
 }
 
+function getAllNews() {
+  return news
+    .slice()
+    .sort((a, b) => {
+      if (!!a.isPinned !== !!b.isPinned) {
+        return a.isPinned ? -1 : 1;
+      }
+
+      const sortOrderA = typeof a.sortOrder === 'number' ? a.sortOrder : 999;
+      const sortOrderB = typeof b.sortOrder === 'number' ? b.sortOrder : 999;
+      if (sortOrderA !== sortOrderB) {
+        return sortOrderA - sortOrderB;
+      }
+
+      return a.publishTime < b.publishTime ? 1 : -1;
+    })
+    .map(normalizeNewsItem);
+}
+
 function getFeaturedNews(eventId) {
   return getNewsByEvent(eventId).filter((item) => item.isFeatured);
+}
+
+function getFeaturedNewsAll() {
+  return getAllNews().filter((item) => item.isFeatured);
 }
 
 function getNewsById(newsId) {
@@ -215,7 +238,9 @@ module.exports = {
   getDefaultEventId,
   getEventById,
   getEventOverview,
+  getAllNews,
   getFeaturedNews,
+  getFeaturedNewsAll,
   getNewsByEvent,
   getNewsById,
   getGroupedMatchesByEvent,

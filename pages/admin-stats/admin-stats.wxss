@@ -1,5 +1,5 @@
 .admin-shell {
-  padding-bottom: 48rpx;
+  padding-bottom: calc(220rpx + env(safe-area-inset-bottom));
 }
 
 .stats-toolbar {

@@ -50,6 +50,7 @@ image {
 
 .page-shell--safe {
   padding-top: 84rpx;
+  padding-bottom: calc(240rpx + env(safe-area-inset-bottom));
 }
 
 .page-top-actions {

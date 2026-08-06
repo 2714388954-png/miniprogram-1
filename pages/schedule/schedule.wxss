@@ -1,3 +1,70 @@
+.event-filter-row {
+  display: flex;
+  align-items: stretch;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.event-filter-card {
+  flex: 1;
+  min-width: 0;
+  padding: 14rpx 16rpx;
+  border-radius: 20rpx;
+  background: #ffffff;
+  border: 1rpx solid rgba(13, 95, 212, 0.08);
+  box-shadow: 0 10rpx 24rpx rgba(17, 53, 87, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.event-filter-card__label {
+  flex: none;
+  font-size: 20rpx;
+  color: var(--theme-text-secondary);
+  white-space: nowrap;
+}
+
+.event-filter-card__picker {
+  flex: 1;
+  min-width: 0;
+  min-height: 60rpx;
+  padding: 0 14rpx;
+  border-radius: 16rpx;
+  background: #f8fbff;
+  border: 1rpx solid rgba(13, 95, 212, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10rpx;
+}
+
+.event-filter-card__picker--disabled {
+  background: #f4f6f8;
+  border-color: rgba(17, 53, 87, 0.08);
+}
+
+.event-filter-card__value {
+  flex: 1;
+  min-width: 0;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--theme-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-filter-card__picker--disabled .event-filter-card__value {
+  color: var(--theme-text-secondary);
+}
+
+.event-filter-card__arrow {
+  flex: none;
+  font-size: 20rpx;
+  color: var(--theme-text-secondary);
+}
+
 .schedule-shell {
   padding-left: 18rpx;
   padding-right: 18rpx;

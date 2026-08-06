@@ -117,8 +117,37 @@ async function getNewsByEvent(eventId) {
   });
 }
 
+async function getAllNews() {
+  const db = getDatabase();
+  if (!db) {
+    return localContentService.getAllNews();
+  }
+
+  const result = await db.collection('news').get();
+  const rows = (result.data || []).map(normalizeNewsItem);
+
+  return rows.sort((a, b) => {
+    if (!!a.isPinned !== !!b.isPinned) {
+      return a.isPinned ? -1 : 1;
+    }
+
+    const sortOrderA = typeof a.sortOrder === 'number' ? a.sortOrder : 999;
+    const sortOrderB = typeof b.sortOrder === 'number' ? b.sortOrder : 999;
+    if (sortOrderA !== sortOrderB) {
+      return sortOrderA - sortOrderB;
+    }
+
+    return a.publishTime < b.publishTime ? 1 : -1;
+  });
+}
+
 async function getFeaturedNews(eventId) {
   const rows = await getNewsByEvent(eventId);
+  return rows.filter((item) => item.isFeatured);
+}
+
+async function getFeaturedNewsAll() {
+  const rows = await getAllNews();
   return rows.filter((item) => item.isFeatured);
 }
 
@@ -265,7 +294,9 @@ module.exports = {
   getDefaultEventId,
   getEventById,
   getEventOverview,
+  getAllNews,
   getFeaturedNews,
+  getFeaturedNewsAll,
   getNewsByEvent,
   getNewsById,
   getGroupedMatchesByEvent,

@@ -69,8 +69,16 @@ const service = {
     return call('getEventOverview', eventId);
   },
 
+  getAllNews() {
+    return call('getAllNews');
+  },
+
   getFeaturedNews(eventId) {
     return call('getFeaturedNews', eventId);
+  },
+
+  getFeaturedNewsAll() {
+    return call('getFeaturedNewsAll');
   },
 
   getNewsByEvent(eventId) {

@@ -33,6 +33,23 @@ function createEmptyForm(eventId) {
   };
 }
 
+function createEmptyEventForm() {
+  return {
+    recordId: '',
+    updatedAt: '',
+    eventId: '',
+    eventName: '',
+    fullName: '',
+    eventType: 'league',
+    season: '',
+    description: '',
+    status: 'upcoming',
+    sortOrder: '0',
+    coverImage: '',
+    cupDisplayMode: 'group',
+  };
+}
+
 function buildScorersText(scorers) {
   return (scorers || [])
     .map((item) => [item.player || '', item.team || '', item.minute || ''].join('，'))
@@ -77,15 +94,26 @@ Page({
     newsOptionIndex: 0,
     isLoading: true,
     showEditor: false,
+    showEventEditor: false,
     isSaving: false,
+    isSavingEvent: false,
     editorTitle: '新增比赛',
+    eventEditorTitle: '编辑赛事',
     statusOptions: matchAdminService.STATUS_OPTIONS,
+    eventStatusOptions: matchAdminService.EVENT_STATUS_OPTIONS,
+    eventTypeOptions: matchAdminService.EVENT_TYPE_OPTIONS,
+    cupDisplayModeOptions: matchAdminService.CUP_DISPLAY_MODE_OPTIONS,
     cupStagePresets: CUP_STAGE_PRESETS,
     statusIndex: 0,
+    eventStatusIndex: 0,
+    eventTypeIndex: 0,
+    eventDisplayModeIndex: 0,
     formData: createEmptyForm(''),
+    eventFormData: createEmptyEventForm(),
   },
 
   draftFormData: createEmptyForm(''),
+  draftEventFormData: createEmptyEventForm(),
   pendingOpenParams: null,
 
   async onLoad(options) {
@@ -146,6 +174,7 @@ Page({
       newsOptions,
       newsOptionIndex: 0,
       showEditor: false,
+      showEventEditor: false,
       formData: nextFormData,
       statusIndex: 0,
     });
@@ -195,6 +224,68 @@ Page({
       statusIndex: 0,
     });
     this.draftFormData = { ...nextFormData };
+  },
+
+  openEventEditor() {
+    const currentEvent = this.data.currentEvent;
+    if (!currentEvent) {
+      return;
+    }
+
+    const eventStatusIndex = Math.max(
+      0,
+      this.data.eventStatusOptions.findIndex((item) => item.value === (currentEvent.status || 'upcoming')),
+    );
+    const eventTypeIndex = Math.max(
+      0,
+      this.data.eventTypeOptions.findIndex((item) => item.value === (currentEvent.eventType || 'league')),
+    );
+    const eventDisplayModeIndex = Math.max(
+      0,
+      this.data.cupDisplayModeOptions.findIndex((item) => item.value === (currentEvent.cupDisplayMode || 'group')),
+    );
+
+    const nextFormData = {
+      recordId: currentEvent._id || '',
+      updatedAt: currentEvent.updatedAt || '',
+      eventId: currentEvent.eventId || '',
+      eventName: currentEvent.eventName || '',
+      fullName: currentEvent.fullName || '',
+      eventType: currentEvent.eventType || 'league',
+      season: currentEvent.season || '',
+      description: currentEvent.description || '',
+      status: currentEvent.status || 'upcoming',
+      sortOrder:
+        currentEvent.sortOrder === undefined || currentEvent.sortOrder === null ? '0' : String(currentEvent.sortOrder),
+      coverImage: currentEvent.coverImage || '',
+      cupDisplayMode: currentEvent.cupDisplayMode || 'group',
+    };
+
+    this.setData({
+      showEventEditor: true,
+      eventEditorTitle: '编辑赛事',
+      eventStatusIndex,
+      eventTypeIndex,
+      eventDisplayModeIndex,
+      eventFormData: nextFormData,
+    });
+    this.draftEventFormData = { ...nextFormData };
+  },
+
+  openCreateEventForm() {
+    const nextFormData = createEmptyEventForm();
+    const nextSortOrder = this.data.events.length;
+    nextFormData.sortOrder = String(nextSortOrder);
+
+    this.setData({
+      showEventEditor: true,
+      eventEditorTitle: '新增赛事',
+      eventStatusIndex: 0,
+      eventTypeIndex: 0,
+      eventDisplayModeIndex: 0,
+      eventFormData: nextFormData,
+    });
+    this.draftEventFormData = { ...nextFormData };
   },
 
   openEditForm(event) {
@@ -251,6 +342,18 @@ Page({
       statusIndex: 0,
     });
     this.draftFormData = { ...nextFormData };
+  },
+
+  closeEventEditor() {
+    const nextFormData = createEmptyEventForm();
+    this.setData({
+      showEventEditor: false,
+      eventStatusIndex: 0,
+      eventTypeIndex: 0,
+      eventDisplayModeIndex: 0,
+      eventFormData: nextFormData,
+    });
+    this.draftEventFormData = { ...nextFormData };
   },
 
   handleFieldInput(event) {
@@ -332,6 +435,84 @@ Page({
     });
   },
 
+  handleEventFieldInput(event) {
+    const { field } = event.currentTarget.dataset;
+    const nextValue = event.detail.value;
+
+    this.draftEventFormData = {
+      ...(this.draftEventFormData || {}),
+      [field]: nextValue,
+    };
+
+    this.setData({
+      [`eventFormData.${field}`]: nextValue,
+    });
+  },
+
+  handleEventStatusChange(event) {
+    const eventStatusIndex = Number(event.detail.value);
+    const target = this.data.eventStatusOptions[eventStatusIndex];
+    if (!target) {
+      return;
+    }
+
+    this.draftEventFormData = {
+      ...(this.draftEventFormData || {}),
+      status: target.value,
+    };
+
+    this.setData({
+      eventStatusIndex,
+      'eventFormData.status': target.value,
+    });
+  },
+
+  handleEventTypeChange(event) {
+    const eventTypeIndex = Number(event.detail.value);
+    const target = this.data.eventTypeOptions[eventTypeIndex];
+    if (!target) {
+      return;
+    }
+
+    const nextPatch = {
+      eventType: target.value,
+    };
+
+    if (target.value !== 'cup') {
+      nextPatch.cupDisplayMode = 'group';
+    }
+
+    this.draftEventFormData = {
+      ...(this.draftEventFormData || {}),
+      ...nextPatch,
+    };
+
+    this.setData({
+      eventTypeIndex,
+      ...(target.value !== 'cup' ? { eventDisplayModeIndex: 0 } : {}),
+      'eventFormData.eventType': target.value,
+      ...(target.value !== 'cup' ? { 'eventFormData.cupDisplayMode': 'group' } : {}),
+    });
+  },
+
+  handleEventDisplayModeChange(event) {
+    const eventDisplayModeIndex = Number(event.detail.value);
+    const target = this.data.cupDisplayModeOptions[eventDisplayModeIndex];
+    if (!target) {
+      return;
+    }
+
+    this.draftEventFormData = {
+      ...(this.draftEventFormData || {}),
+      cupDisplayMode: target.value,
+    };
+
+    this.setData({
+      eventDisplayModeIndex,
+      'eventFormData.cupDisplayMode': target.value,
+    });
+  },
+
   handleRelatedNewsChange(event) {
     const newsOptionIndex = Number(event.detail.value);
     const target = this.data.newsOptions[newsOptionIndex] || this.data.newsOptions[0];
@@ -358,6 +539,16 @@ Page({
 
     setTimeout(() => {
       this.submitMatch();
+    }, 80);
+  },
+
+  handleSaveEventTap() {
+    if (this.data.isSavingEvent) {
+      return;
+    }
+
+    setTimeout(() => {
+      this.submitEvent();
     }, 80);
   },
 
@@ -433,6 +624,70 @@ Page({
       });
     } finally {
       this.setData({ isSaving: false });
+    }
+  },
+
+  async submitEvent(overrideFormData) {
+    const { isSavingEvent, activeEventId } = this.data;
+    if (isSavingEvent) {
+      return;
+    }
+
+    const formData = {
+      ...this.data.eventFormData,
+      ...(this.draftEventFormData || {}),
+      ...(overrideFormData || {}),
+    };
+
+    if (
+      !String(formData.eventId || '').trim() ||
+      !String(formData.eventName || '').trim() ||
+      !String(formData.fullName || '').trim() ||
+      !String(formData.season || '').trim()
+    ) {
+      wx.showToast({
+        title: '请先填写赛事编号、赛事简称、赛事全称和赛季',
+        icon: 'none',
+      });
+      return;
+    }
+
+    this.setData({
+      isSavingEvent: true,
+      eventFormData: formData,
+    });
+
+    try {
+      const savedEvent = await matchAdminService.saveEvent(formData);
+      const nextActiveEventId = savedEvent && savedEvent.eventId ? savedEvent.eventId : activeEventId;
+
+      wx.showToast({
+        title: '赛事已保存',
+        icon: 'success',
+      });
+
+      await this.loadPage();
+
+      if (nextActiveEventId && nextActiveEventId !== this.data.activeEventId) {
+        await this.loadMatchesForEvent(this.data.events, nextActiveEventId);
+      }
+
+      const nextFormData = createEmptyEventForm();
+      this.setData({
+        showEventEditor: false,
+        eventStatusIndex: 0,
+        eventTypeIndex: 0,
+        eventDisplayModeIndex: 0,
+        eventFormData: nextFormData,
+      });
+      this.draftEventFormData = { ...nextFormData };
+    } catch (error) {
+      wx.showToast({
+        title: error.message || '保存失败，请稍后重试',
+        icon: 'none',
+      });
+    } finally {
+      this.setData({ isSavingEvent: false });
     }
   },
 
